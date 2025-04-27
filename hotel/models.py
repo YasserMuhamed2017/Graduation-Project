@@ -1,18 +1,16 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
-class User(models.Model):
-    username = models.CharField(max_length=30, unique=True)
-    password = models.CharField(max_length=100)  # Store hashed passwords in production
-    email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+class User(AbstractUser):
     phone_number = models.CharField(max_length=15, unique=True)
-    address = models.CharField(max_length=100)
     date_of_birth = models.DateField()
     is_admin = models.BooleanField(default=False)  # True if the user is an admin
-    role = models.CharField(max_length=20, choices=[('customer', 'Customer'), ('staff', 'Staff')])
     gender = models.CharField(max_length=10)  
+    is_verified = models.BooleanField(default=False)  # True if the user has verified their email
+
+    def __str__(self):
+        return self.email
 
 class Hotel(models.Model):
     contact_number = models.CharField(max_length=15, unique=True)

@@ -31,13 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'hotel',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'hotel',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +67,12 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AUTH_USER_MODEL = 'hotel.User'
 
 WSGI_APPLICATION = 'graduation_project.wsgi.application'
 
@@ -131,3 +137,15 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py
+
+# Mailtrap SMTP configuration for email verification
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mailtrap.io'  # Mailtrap SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'b7398598174df0'  # Your Mailtrap username
+EMAIL_HOST_PASSWORD = '1e27d455a60ee1'  # Your Mailtrap password
+DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'  # From email
+    

@@ -8,16 +8,11 @@
             <div class="card shadow-sm border-0 rounded" style="background-color: #f8f9fa;">  <!-- Add your desired background color here -->
                 <div class="card-body p-4">
                     <h2 class="text-center mb-4">Login</h2>
-                    {% if form.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ form.errors|striptags }}
-                        </div>
-                    {% endif %}
-                    <form method="post" action="{% url 'login' %}">
+                    <form method="post">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="username" class="form-label">Email</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <label for="email" class="form-label">Email</label>
+                            <input type="text" class="form-control" id="email" name="email" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>

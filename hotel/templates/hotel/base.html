@@ -53,13 +53,19 @@
                 <li class="nav-item">
                   <a class="nav-link fw-semibold" href="#">Contact</a>
                 </li>
-        
-                <li class="nav-item ms-3">
-                  <a class="btn btn-light rounded-pill px-4" href="{% url 'login' %}" style="color: #0062E6; font-weight: 600;">
-                    Login
-                  </a>
-                </li>
-        
+                {% if not user.is_authenticated %}
+                  <li class="nav-item ms-3">
+                    <a class="btn btn-light rounded-pill px-4" href="{% url 'login' %}" style="color: #0062E6; font-weight: 600;">
+                      Login
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="nav-item ms-3">
+                    <a class="btn btn-light rounded-pill px-4" href="{%url 'logout' %}" style="color: #0062E6; font-weight: 600;">
+                      Logout
+                    </a>
+                  </li>
+                {% endif %}
               </ul>
             </div>
           </div>
