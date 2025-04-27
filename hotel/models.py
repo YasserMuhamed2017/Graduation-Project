@@ -3,12 +3,16 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
+    email = models.EmailField(unique=True)  # Email field for user login
     phone_number = models.CharField(max_length=15, unique=True)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True, blank=True)  # Date of birth field
     is_admin = models.BooleanField(default=False)  # True if the user is an admin
     gender = models.CharField(max_length=10)  
     is_verified = models.BooleanField(default=False)  # True if the user has verified their email
 
+    USERNAME_FIELD = 'email'  # Use email as the username field
+    REQUIRED_FIELDS = ['username', 'phone_number']
+    
     def __str__(self):
         return self.email
 
@@ -20,9 +24,14 @@ class Hotel(models.Model):
     rating = models.DecimalField(max_digits=3, decimal_places=2)
 
 class Room(models.Model):
+    choices = (
+        ('Single', 'Single'),
+        ('Double', 'Double'),
+        ('Suite', 'Suite'),
+    )
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
     room_number = models.CharField(max_length=10)
-    room_type = models.CharField(max_length=20)  # e.g., Single, Double, Suite
+    room_type = models.CharField(max_length=20, choices=choices, default='Single')  # e.g., Single, Double, Suite
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
     availability = models.BooleanField(default=True)
     amenities = models.TextField()  # e.g., Wi-Fi, TV, AC, etc.

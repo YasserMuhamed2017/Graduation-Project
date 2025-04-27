@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +50,46 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+JAZZMIN_SETTINGS = {
+    "show_ui_builder": True,
+    "site_title": "Hotel Management Admin",
+    "site_header": "Hotel Management",
+    "site_brand": "Hotel",
+    "welcome_sign": "Welcome to Hotel Management Dashboard",
+    "copyright": "Hotel Management",
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "user_avatar": None,  # or 'path.to.avatar.field'
+
+    # Customize the top menu
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"model": "auth.User"},
+        {"app": "hotel"},
+    ],
+
+    # Customize the side menu
+    "sidebar": {
+        "show_sidebar": True,
+        "navigation_expanded": True,
+        "hide_apps": [],
+        "hide_models": [],
+        "order_with_respect_to": ["hotel", "auth"],
+    },
+
+    # Customize the icons
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "hotel.booking": "fas fa-hotel",
+        "hotel.room": "fas fa-bed",
+    },
+
+    "related_modal_active": True,
+}
 
 ROOT_URLCONF = 'graduation_project.urls'
 
@@ -132,6 +173,10 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "hotel" / "static",  # Ensure you have a 'static' folder in your project root
 ]
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -13,7 +13,8 @@ from django.utils.html import strip_tags
 
 # Create your views here.
 def index(request):
-    return render(request, 'hotel/index.html')
+    rooms = Room.objects.all()  # Fetch all rooms from the database
+    return render(request, 'hotel/index.html', {'rooms': rooms})
 
 def login_view(request):
     return render(request, 'hotel/login.html')
@@ -101,7 +102,7 @@ def login_view(request):
         email = request.POST.get('email')  # assuming you're using email as username
         password = request.POST.get('password')
 
-        user = authenticate(request, username=email, password=password)
+        user = authenticate(request, email=email, password=password)
         print(user) 
         if user is not None:
             if user.is_active:
