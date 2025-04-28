@@ -10,6 +10,8 @@ from django.contrib.auth import authenticate, logout
 from hotel.models import *
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from .models import Hotel, Room
+from collections import defaultdict
 
 # Create your views here.
 def index(request):
@@ -122,3 +124,45 @@ def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect('login')  # Redirect to login page after logout
+
+# Hotel search 
+def hotel_search(request):
+    query = request.GET.get('location', '')
+    results = []
+    if query:
+        results = Hotel.objects.filter(
+            Q(name__icontains=query) | Q(location__icontains=query)
+        )
+    return render(request, 'hotel/index.html', {'hotels': results, 'query': query})
+
+
+
+
+def hotel_detail(request, pk):
+    hotel = get_object_or_404(Hotel, pk=pk)
+    rooms = hotel.rooms.all()
+
+    selected_room_type = request.GET.get('room_type')
+    selected_availability = request.GET.get('availability')
+
+    if selected_room_type:
+        rooms = rooms.filter(room_type=selected_room_type)
+    if selected_availability == 'available':
+        rooms = rooms.filter(availability=True)
+    elif selected_availability == 'unavailable':
+        rooms = rooms.filter(availability=False)
+
+    grouped_rooms_by_type = defaultdict(list)
+    if not selected_room_type:
+        for room in rooms:
+            grouped_rooms_by_type[room.room_type].append(room)
+
+    context = {
+        'hotel': hotel,
+        'rooms': rooms,
+        'selected_room_type': selected_room_type,
+        'selected_availability': selected_availability,
+        'grouped_rooms_by_type': dict(grouped_rooms_by_type),
+    }
+    return render(request, 'hotel/hotel_detail.html', context)
+
