@@ -13,8 +13,8 @@ from django.utils.html import strip_tags
 
 # Create your views here.
 def index(request):
-    rooms = Room.objects.all()  # Fetch all rooms from the database
-    return render(request, 'hotel/index.html', {'rooms': rooms})
+    hotels = Hotel.objects.all()  
+    return render(request, 'hotel/index.html', {'hotels': hotels})
 
 def login_view(request):
     return render(request, 'hotel/login.html')

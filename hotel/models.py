@@ -22,6 +22,7 @@ class Hotel(models.Model):
     location = models.CharField(max_length=100)
     description = models.TextField()
     rating = models.DecimalField(max_digits=3, decimal_places=2)
+    image = models.ImageField(upload_to='hotel_images/')  # Image field for hotel images
 
 class Room(models.Model):
     choices = (
