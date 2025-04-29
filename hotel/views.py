@@ -169,3 +169,17 @@ def hotel_detail(request, pk):
     }
     return render(request, 'hotel/hotel_detail.html', context)
 
+
+  #profile_viwe
+  
+def profile_view (request,pk):
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.phone_number = request.POST.get('phone_number')
+        user.save()
+        messages.success(request, "Profile updated successfully.")
+        return redirect('profile_detail', pk=pk)
+    return render(request, 'hotel/profile_detail.html')
