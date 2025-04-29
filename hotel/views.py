@@ -187,6 +187,7 @@ def hotel_detail(request, pk):
 
 
 
+
 def ajax_filter_rooms(request, hotel_id):
     room_type = request.GET.get('room_type')
     availability = request.GET.get('availability')
@@ -203,6 +204,8 @@ def ajax_filter_rooms(request, hotel_id):
 
     html = render_to_string('hotel/partials/room_list.html', {'rooms': rooms})
     return JsonResponse({'html': html})
+
+
 
 
 
