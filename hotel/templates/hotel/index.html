@@ -2,6 +2,7 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 
+
 <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
   <div class="carousel-indicators">
     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
@@ -33,31 +34,16 @@
   }
 </style>
 
+
+
+<div class="container my-4">
+  <input type="text" id="searchInput" class="form-control my-5" placeholder="Search by hotel name or location">
+</div>
+
+
 <div class="container">
-  <div class="search-form mb-5">
-    <form action="{% url 'hotel_search' %}" method="GET">
-      <div class="row">
-        <div class="col-md-10 mb-3">
-          <label for="location" class="form-label">Search for Hotel </label>
-          <input type="text" id="location" name="location" class="form-control" placeholder="Enter city or hotel name"
-            required value="{{ request.GET.location }}">
-        </div>
-        <div class="col-md-2 d-flex align-items-end mb-3">
-          <button type="submit" class="btn btn-primary w-100">Search</button>
-        </div>
-      </div>
-      <div class="text-end">
-        <a href="{% url 'index' %}" class="btn btn-secondary btn-sm mt-2">Reset Filters</a>
-      </div>
-    </form>
-  </div>
-
-  {% if query %}
-  <h2>Search Results for "{{ query }}"</h2>
-  <br>
-
-  {% if hotels %}
-  <div class="row g-4">
+  <h2 class="mb-4" id="searchTitle">All Hotels</h2>
+  <div class="row g-4" id="default-hotels">
     {% for hotel in hotels %}
     <div class="col-md-4">
       <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
@@ -69,26 +55,7 @@
           <h5 class="card-title">{{ hotel.name }}</h5>
           <h6 class="card-subtitle text-muted mb-2">{{ hotel.location }}</h6>
           <p class="card-text">{{ hotel.description|truncatewords:10 }}</p>
-
-          <p class="card-text">
-            Contact: {{ hotel.contact_number }}
-          </p>
-
-          <p class="card-text">
-            Hotel Rating:
-            {% with rating=hotel.rating %}
-            {% for i in "12345" %}
-            {% if rating >= forloop.counter %}
-            <i class="fas fa-star text-warning"></i>
-            {% elif rating >= forloop.counter0|add:"0.5" %}
-            <i class="fas fa-star-half-alt text-warning"></i>
-            {% else %}
-            <i class="far fa-star text-warning"></i>
-            {% endif %}
-            {% endfor %}
-            {% endwith %}
-          </p>
-
+          <p class="card-text">Contact: {{ hotel.contact_number }}</p>
           <div class="mt-auto">
             <a href="{% url 'hotel_detail' hotel.pk %}" class="btn btn-primary w-100 rounded-pill">View Details</a>
           </div>
@@ -97,92 +64,59 @@
     </div>
     {% endfor %}
   </div>
-  {% else %}
-  <h2>No results </h2>
-  {% endif %}
-  {% else %}
-  <h2>All Hotels</h2>
-  <br>
-  <div class="row g-4">
-  {% for hotel in hotels %}
-  <div class="col-md-4">
-    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-      <div class="position-relative">
-        <img src="{{ hotel.image.url }}" class="card-img-top" alt="{{ room.room_number }}"
-          style="height: 250px; object-fit: cover;">
-      </div>
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{ hotel.name }}</h5>
-        <h5 class="card-title">Contact: {{ hotel.contact_number }}</h5>
-        <p class="card-subtitle text-muted mb-2">{{ hotel.location }}</p>
-        <p class="card-text">{{ hotel.description|truncatewords:10 }}</p>
-        <p class="card-text">
-          Hotel Rating:
-          {% with rating=hotel.rating %}
-          {% for i in "12345" %}
-          {% if rating >= forloop.counter %}
-          <i class="fas fa-star text-warning"></i>
-          {% elif rating >= forloop.counter0|add:"0.5" %}
-          <i class="fas fa-star-half-alt text-warning"></i>
-          {% else %}
-          <i class="far fa-star text-warning"></i>
-          {% endif %}
-          {% endfor %}
-          {% endwith %}
-        </p>
-
-        <div class="mt-auto">
-          <a href="{% url 'hotel_detail' hotel.pk %}" class="btn btn-primary w-100 rounded-pill">View Details</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endfor %}
-</div>
-  {% endif %}
 </div>
 
-<!-- Example Code End -->
-{% comment %} <div class="container py-5">
-  <h1 class="mb-4">Our Hotels</h1>
-  <div class="row g-4">
-    {% for hotel in hotels %}
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-        <div class="position-relative">
-          <img src="{{ hotel.image.url }}" class="card-img-top" alt="{{ room.room_number }}"
-            style="height: 250px; object-fit: cover;">
-        </div>
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">{{ hotel.name }}</h5>
-          <h5 class="card-title">Contact: {{ hotel.contact_number }}</h5>
-          <p class="card-subtitle text-muted mb-2">{{ hotel.location }}</p>
-          <p class="card-text">{{ hotel.description|truncatewords:10 }}</p>
-          <p class="card-text">
-            Hotel Rating:
-            {% with rating=hotel.rating %}
-            {% for i in "12345" %}
-            {% if rating >= forloop.counter %}
-            <i class="fas fa-star text-warning"></i>
-            {% elif rating >= forloop.counter0|add:"0.5" %}
-            <i class="fas fa-star-half-alt text-warning"></i>
-            {% else %}
-            <i class="far fa-star text-warning"></i>
-            {% endif %}
-            {% endfor %}
-            {% endwith %}
-          </p>
 
-          <div class="mt-auto">
-            <a href="{% url 'hotel_detail' hotel.pk %}" class="btn btn-primary w-100 rounded-pill">View Details</a>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const resultsContainer = document.getElementById('default-hotels');
+  const searchTitle = document.getElementById('searchTitle');
 
-</div> {% endcomment %}
+  searchInput.addEventListener('input', function () {
+    const query = searchInput.value.trim();
+
+    fetch(`/hotel/ajax/hotel-search/?location=${encodeURIComponent(query)}`)
+
+      .then(response => response.json())
+      .then(data => {
+        resultsContainer.innerHTML = '';
+
+        if (!query) {
+          searchTitle.textContent = 'All Hotels';
+        } else {
+          searchTitle.textContent = `Search Results for "${query}"`;
+        }
+
+        if (data.hotels.length === 0) {
+          resultsContainer.innerHTML = '<p>No results found.</p>';
+          return;
+        }
+
+        data.hotels.forEach(hotel => {
+          const hotelCard = `
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="position-relative">
+                  <img src="${hotel.image_url}" class="card-img-top" alt="${hotel.name}" style="height: 250px; object-fit: cover;">
+                </div>
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">${hotel.name}</h5>
+                  <h6 class="card-subtitle text-muted mb-2">${hotel.location}</h6>
+                  <p class="card-text">${hotel.description}</p>
+                  <p class="card-text">Contact: ${hotel.contact_number}</p>
+                  <div class="mt-auto">
+                    <a href="/hotel/hotel/${hotel.id}/" class="btn btn-primary w-100 rounded-pill">View Details</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          resultsContainer.innerHTML += hotelCard;
+        });
+      });
+  });
+</script>
+
 </div>
 
 {% endblock %}
