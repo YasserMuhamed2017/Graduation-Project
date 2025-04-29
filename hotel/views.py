@@ -173,6 +173,7 @@ def hotel_detail(request, pk):
 
   
 def profile_view (request,pk):
+    
     if request.method == 'POST':
         user = request.user
         user.first_name = request.POST.get('first_name')
