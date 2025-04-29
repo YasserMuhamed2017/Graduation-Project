@@ -169,6 +169,7 @@ def hotel_detail(request, pk):
     }
     return render(request, 'hotel/hotel_detail.html', context)
 
+
 def book_room(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     bookings = room.bookings.all()  # Get all bookings for this room
@@ -180,3 +181,17 @@ def book_room(request, room_id):
         return redirect('index')  # Redirect to a success page or hotel detail page
 
     return render(request, 'hotel/book_room.html', {'room': room, 'bookings': bookings})
+
+#profile_viwe
+  
+def profile_view (request,pk):
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.phone_number = request.POST.get('phone_number')
+        user.save()
+        messages.success(request, "Profile updated successfully.")
+        return redirect('profile_detail', pk=pk)
+    return render(request, 'hotel/profile_detail.html')
