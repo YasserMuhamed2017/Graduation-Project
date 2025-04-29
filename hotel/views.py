@@ -170,7 +170,7 @@ def hotel_detail(request, pk):
     return render(request, 'hotel/hotel_detail.html', context)
 
 
-  #profile_viwe
+
   
 def profile_view (request,pk):
     if request.method == 'POST':
@@ -183,3 +183,4 @@ def profile_view (request,pk):
         messages.success(request, "Profile updated successfully.")
         return redirect('profile_detail', pk=pk)
     return render(request, 'hotel/profile_detail.html')
+  

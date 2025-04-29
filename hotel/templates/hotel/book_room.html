@@ -1,0 +1,119 @@
+{% extends 'hotel/base.html' %}
+{% load static %}
+
+{% block title %}Booking Calendar{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center mt-5">
+    <div class="card mb-4" style="width: 100%; max-width: 1000px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: row;">
+        
+        <!-- Room Image -->
+        <div style="flex: 1;">
+            <img src="{{ room.room_image.url }}" alt="{{ room.room_number }}" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <!-- Room Details -->
+        <div class="card-body" style="flex: 2; padding: 30px;">
+            <h3 class="card-title mb-3 text-primary" style="font-weight: bold;">Room {{ room.room_number }}</h3>
+        
+            <p class="mb-2">
+                <strong class="text-muted">Type:</strong> 
+                <span class="text-dark">{{ room.room_type }}</span>
+            </p>
+        
+            <p class="mb-2">
+                <strong class="text-muted">Price per Night:</strong> 
+                <span class="text-success" style="font-weight: bold;">${{ room.price_per_night }}</span>
+            </p>
+        
+            <p class="mb-2">
+                <strong class="text-muted">Amenities:</strong> 
+                <span class="text-dark">{{ room.amenities }}</span>
+            </p>
+        
+            <p class="mb-2">
+                <strong class="text-muted">Availability:</strong> 
+                {% if room.availability %}
+                    <span class="badge bg-success">Available</span>
+                {% else %}
+                    <span class="badge bg-danger">Not Available</span>
+                {% endif %}
+            </p>
+        
+            <a href="#" class="btn btn-primary mt-4 w-100 rounded-pill" style="font-weight: bold;">Book Now</a>
+        </div>
+        
+
+    </div>
+</div>
+
+<div class="container my-5" style="margin-left: 300px;">
+    <h3 class="mb-4 text-primary">All Bookings Calendar</h3>
+
+    <div class="row mb-3 ">
+        <div class="col-md-8">
+            <input id="booking-calendar" class="form-control" type="text" readonly style="background-color: white; cursor: pointer;">
+        </div>
+    </div>
+</div>
+
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    
+        function getDatesBetween(startDate, endDate) {
+            const dates = [];
+            const currentDate = new Date(startDate);
+            const lastDate = new Date(endDate);
+    
+            while (currentDate <= lastDate) {
+                dates.push(currentDate.toISOString().split('T')[0]);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return dates;
+        }
+    
+        let allDates = [];
+    
+        {% for booking in bookings %}
+            allDates = allDates.concat(
+                getDatesBetween(
+                    "{{ booking.check_in_date|date:'Y-m-d' }}",
+                    "{{ booking.check_out_date|date:'Y-m-d' }}"
+                )
+            );
+        {% endfor %}
+    
+        const calendarInput = document.getElementById("booking-calendar");
+    
+        const calendar = flatpickr(calendarInput, {
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            defaultDate: allDates,
+            clickOpens: false,   // disable auto open
+            allowInput: false,
+            inline: false        // Now the calendar will act like popup (NOT embedded in page)
+        });
+    
+        // When clicking on input → open the calendar manually
+        calendarInput.addEventListener("click", function(e) {
+            calendar.open();
+            e.stopPropagation();
+        });
+    
+        // Clicking outside → close the calendar
+        document.addEventListener("click", function(e) {
+            const calendarContainer = document.querySelector(".flatpickr-calendar");
+            if (!calendarInput.contains(e.target) && !calendarContainer.contains(e.target)) {
+                calendar.close();
+            }
+        });
+    
+    });
+    </script>
+    
+{% endblock %}
