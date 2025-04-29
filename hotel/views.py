@@ -15,6 +15,8 @@ from collections import defaultdict
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 # Create your views here.
 def index(request):
@@ -129,18 +131,32 @@ def logout_view(request):
     return redirect('login')  # Redirect to login page after logout
 
 # Hotel search 
-def hotel_search(request):
-    query = request.GET.get('location', '')
-    results = []
-    if query:
-        results = Hotel.objects.filter(
-            Q(name__icontains=query) | Q(location__icontains=query)
-        )
-    return render(request, 'hotel/index.html', {'hotels': results, 'query': query})
+
+# AJAX Hotel Search
+def ajax_hotel_search(request):
+    query = request.GET.get('location', '').strip()
+    if not query:
+        return JsonResponse({'hotels': []})
+
+    hotels = Hotel.objects.filter(
+        Q(name__icontains=query) | Q(location__icontains=query)
+    )
+
+    data = []
+    for hotel in hotels:
+        data.append({
+            'id': hotel.id,
+            'name': hotel.name,
+            'location': hotel.location,
+            'description': hotel.description[:50] + '...',
+            'contact_number': hotel.contact_number,
+            'image_url': hotel.image.url if hotel.image else '',
+        })
+
+    return JsonResponse({'hotels': data})
 
 
-
-
+# Hotel details
 def hotel_detail(request, pk):
     hotel = get_object_or_404(Hotel, pk=pk)
     rooms = hotel.rooms.all()
@@ -171,7 +187,28 @@ def hotel_detail(request, pk):
 
 
 
-  
+
+def ajax_filter_rooms(request, hotel_id):
+    room_type = request.GET.get('room_type')
+    availability = request.GET.get('availability')
+
+    rooms = Room.objects.filter(hotel_id=hotel_id)
+
+    if room_type:
+        rooms = rooms.filter(room_type=room_type)
+    if availability:
+        if availability == 'available':
+            rooms = rooms.filter(availability=True)
+        elif availability == 'unavailable':
+            rooms = rooms.filter(availability=False)
+
+    html = render_to_string('hotel/partials/room_list.html', {'rooms': rooms})
+    return JsonResponse({'html': html})
+
+
+
+
+
 def profile_view (request,pk):
     
     if request.method == 'POST':
