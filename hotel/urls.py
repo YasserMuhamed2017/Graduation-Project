@@ -18,4 +18,8 @@ urlpatterns = [
     # path('hotel/<int:pk>/', views.hotel_detail, name='hotel_detail'),
 
     path('ajax/filter-rooms/<int:hotel_id>/', views.ajax_filter_rooms, name='ajax_filter_rooms'),
+    
+    path('about/', views.about, name='about'),
+    # path('about/', views.about, name='about'),
 ]
+

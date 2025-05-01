@@ -17,6 +17,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+import os
+
 
 # Create your views here.
 def index(request):
@@ -232,4 +234,15 @@ def book_room(request, room_id):
 
     return render(request, 'hotel/book_room.html', {'room': room, 'bookings': bookings})
 
-  
+
+# about view
+def about(request):
+    room_images_dir = os.path.join(settings.MEDIA_ROOT, 'room_images')
+    room_images = []
+
+    if os.path.exists(room_images_dir):
+        for file_name in os.listdir(room_images_dir):
+            if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
+                room_images.append(f'/media/room_images/{file_name}')
+
+    return render(request, 'hotel/about.html', {'room_images': room_images})

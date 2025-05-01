@@ -3,6 +3,9 @@
 
 {% block content %}
 
+<!-- AOS CSS -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
 {% comment %} <div class="container my-5">
   
     <div class="container my-5">
@@ -164,51 +167,53 @@
 
 <div class="container my-5">
   
-  <div class="container my-5">
-      <div class="row">
+  <div class="container my-5" data-aos="fade-up">
+      <div class="row" data-aos="fade-up">
           <div class="col-md-12 mb-4" style="height:70vh ;width:100 ;overflow:hidden">
               <img style="height:70vh; width:100%; object-fit: cover;" src="{{ hotel.image.url }}"
                   class="img-fluid rounded-4 shadow" alt="{{ hotel.name }}">
           </div>
-          <div class="col-md-12 mb-4">
-<div class="p-4 bg-white rounded-4 shadow-sm border border-light-subtle">
-  <!-- Hotel Name and Location -->
-  <div class="mb-3">
-    <h1 class="fw-bold text-primary mb-1">{{ hotel.name }}</h1>
-    <p class="text-muted mb-0"><i class="fas fa-map-marker-alt me-1 text-primary"></i>{{ hotel.location }}</p>
-  </div>
+          <div class="col-md-12 mb-4" data-aos="fade-left">
+            <div class="p-4 bg-white rounded-4 shadow-sm border border-light-subtle">
+              <!-- Hotel Name and Location -->
+              <div class="mb-3">
+                <h1 class="fw-bold text-primary mb-1">{{ hotel.name }}</h1>
+                <p class="text-muted mb-0"><i class="fas fa-map-marker-alt me-1 text-primary"></i>{{ hotel.location }}</p>
+              </div>
 
-  <!-- Description -->
-  <div class="mb-3">
-    <h5 class="text-secondary fw-semibold">About</h5>
-    <p class="mb-0">{{ hotel.description }}</p>
-  </div>
+              <!-- Description -->
+              <div class="mb-3">
+                <h5 class="text-secondary fw-semibold">About</h5>
+                <p class="mb-0">{{ hotel.description }}</p>
+              </div>
 
-  <!-- Contact -->
-  <div class="mb-3">
-    <h5 class="text-secondary fw-semibold">Contact</h5>
-    <p class="mb-0"><i class="fa-solid fa-phone text-primary"></i> {{ hotel.contact_number }}</p>
-  </div>
+              <!-- Contact -->
+              <div class="mb-3">
+                <h5 class="text-secondary fw-semibold">Contact</h5>
+                <p class="mb-0"><i class="fa-solid fa-phone text-primary"></i> {{ hotel.contact_number }}</p>
+              </div>
 
-  <!-- Rating -->
-  <div>
-    <h5 class="text-secondary fw-semibold">Hotel Rating</h5>
-    <div>
-      {% with rating=hotel.rating %}
-        {% for i in "12345" %}
-          {% if rating >= forloop.counter %}
-            <i class="fas fa-star text-warning"></i>
-          {% elif rating >= forloop.counter0|add:"0.5" %}
-            <i class="fas fa-star-half-alt text-warning"></i>
-          {% else %}
-            <i class="far fa-star text-warning"></i>
-          {% endif %}
-        {% endfor %}
-      {% endwith %}
+              <!-- Rating -->
+              <div>
+                <h5 class="text-secondary fw-semibold">Hotel Rating</h5>
+                <div>
+                  {% with rating=hotel.rating %}
+                    {% for i in "12345" %}
+                      {% if rating >= forloop.counter %}
+                        <i class="fas fa-star text-warning"></i>
+                      {% elif rating >= forloop.counter0|add:"0.5" %}
+                        <i class="fas fa-star-half-alt text-warning"></i>
+                      {% else %}
+                        <i class="far fa-star text-warning"></i>
+                      {% endif %}
+                    {% endfor %}
+                  {% endwith %}
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
     </div>
-  </div>
-</div>
-</div>
 
           {% comment %} <div class="col-md-12">
               <h1 class="mb-3">{{ hotel.name }}</h1>
@@ -235,10 +240,15 @@
   
   
           </div> {% endcomment %}
-      </div>
-      <br>
-      <br>
+</div>
+
 <!-- Search Form -->
+<div class="container my-5" data-aos="fade-up">
+  <div class="row mb-3">
+    <div class="col-md-8">
+      <input id="booking-calendar" class="form-control" type="text" readonly style="background-color: white; cursor: pointer;">
+    </div>
+  </div>
 <div class="row">
   <div class="col-md-2">
     <h4 class="mb-4">Filter by : </h4>
@@ -291,7 +301,7 @@
       </form>
     </div>
      {% endcomment %}
-     <div class="search-form mb-5">
+     <div class="search-form mb-5" data-aos="fade-up">
       <form method="get">
         <div class="row">
           
@@ -327,23 +337,18 @@
   <div class="col-md-10 border-start">
     <h4 class="mb-4">Result Rooms</h4>
     <input type="hidden" id="hotel-id" value="{{ hotel.id }}">
-<div class="row g-4" id="filtered-rooms">
-{% include 'hotel/partials/room_list.html' with rooms=rooms %}
-</div>
-
+    <div class="row g-4" id="filtered-rooms">
+    {% include 'hotel/partials/room_list.html' with rooms=rooms %}
   </div>
+
+</div>
+</div>
 </div>
 
 
-<!-- Rooms Section -->
-
-</div>
-
-
-
+<!-- Scripts -->
+  <!-- AOS JS -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script src="{% static 'js/room_filter.js' %}"></script>
-
-
-
 
 {% endblock %}
