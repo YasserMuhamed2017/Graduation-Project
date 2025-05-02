@@ -1,58 +1,237 @@
 {% extends 'hotel/base.html' %}
 {% load static %}
 
-{% block title %}Booking Calendar{% endblock %}
+{% block title %}Book Room {{ room.room_number }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center mt-5">
-    <div class="card mb-4" style="width: 100%; max-width: 1000px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: row;">
-        
-        <!-- Room Image -->
-        <div style="flex: 1;">
-            <img src="{{ room.room_image.url }}" alt="{{ room.room_number }}" style="width: 100%; height: 100%; object-fit: cover;">
+<!-- Room Details Section with Enhanced UI -->
+<div class="container py-5">
+    <div class="row">
+        <!-- Room Information Card -->
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 rounded-4 shadow overflow-hidden">
+                <!-- Room Header with Hotel Name -->
+                <div class="card-header border-0 p-0">
+                    <div class="position-relative">
+                        <img src="{{ room.room_image.url }}" alt="{{ room.room_number }}" class="img-fluid w-100" style="height: 300px; object-fit: cover;">
+                        <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));">
+                            <h2 class="text-white mb-1">Room {{ room.room_number }}</h2>
+                            <p class="text-white mb-0">
+                                <i class="fas fa-hotel me-2"></i>{{ room.hotel.name }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Room Details -->
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Room Details
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <span class="fw-semibold text-muted">Room Type:</span> 
+                                    <span class="badge rounded-pill text-bg-primary">{{ room.room_type }}</span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="fw-semibold text-muted">Price per Night:</span> 
+                                    <span class="text-success fw-bold">${{ room.price_per_night }}</span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="fw-semibold text-muted">Availability:</span>
+                                    {% if room.availability %}
+                                        <span class="badge rounded-pill text-bg-success">Available</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill text-bg-danger">Not Available</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-concierge-bell me-2"></i>Amenities
+                            </h5>
+                            <div class="d-flex flex-wrap">
+                                {% for amenity in room.amenities_list %}
+                                <div class="bg-light rounded-3 py-2 px-3 me-2 mb-2">
+                                    {% if amenity == 'Wi-Fi' %}
+                                        <i class="fas fa-wifi text-primary me-2"></i>
+                                    {% elif amenity == 'TV' %}
+                                        <i class="fas fa-tv text-primary me-2"></i>
+                                    {% elif amenity == 'AC' %}
+                                        <i class="fas fa-snowflake text-primary me-2"></i>
+                                    {% else %}
+                                        <i class="fas fa-check-circle text-primary me-2"></i>
+                                    {% endif %}
+                                    {{ amenity }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Booking Form -->
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <h5 class="text-primary border-bottom pb-2 mb-4">
+                            <i class="fas fa-calendar-check me-2"></i>Make a Reservation
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="check_in_date" class="form-label">Check-in Date</label>
+                                <input type="date" class="form-control" id="check_in_date" name="check_in_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="check_out_date" class="form-label">Check-out Date</label>
+                                <input type="date" class="form-control" id="check_out_date" name="check_out_date" required>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn py-2 text-white" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);" {% if not room.availability %}disabled{% endif %}>
+                                        <i class="fas fa-check-circle me-2"></i>Book Now
+                                    </button>
+                                </div>
+                                {% if not room.availability %}
+                                <div class="alert alert-danger mt-3">
+                                    <i class="fas fa-exclamation-circle me-2"></i>This room is currently not available for booking.
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Reviews Section -->
+            <div class="card border-0 rounded-4 shadow mt-4">
+                <div class="card-body p-4">
+                    <h5 class="text-primary border-bottom pb-2 mb-4">
+                        <i class="fas fa-star me-2"></i>Guest Reviews ({{ reviews.count }})
+                    </h5>
+                    
+                    <!-- Add Review Form -->
+                    {% if user.is_authenticated %}
+                    <div class="mb-4">
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="rating" class="form-label">Your Rating</label>
+                                <div class="rating-stars mb-2">
+                                    <i class="far fa-star fs-4 star-rating" data-rating="1"></i>
+                                    <i class="far fa-star fs-4 star-rating" data-rating="2"></i>
+                                    <i class="far fa-star fs-4 star-rating" data-rating="3"></i>
+                                    <i class="far fa-star fs-4 star-rating" data-rating="4"></i>
+                                    <i class="far fa-star fs-4 star-rating" data-rating="5"></i>
+                                </div>
+                                <input type="hidden" name="rating" id="rating" value="">
+                            </div>
+                            <div class="mb-3">
+                                <label for="review_text" class="form-label">Your Review</label>
+                                <textarea class="form-control" id="review_text" name="review_text" rows="3" placeholder="Share your experience staying in this room..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-sm text-white" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);">
+                                <i class="fas fa-paper-plane me-2"></i>{% if user_has_reviewed %}Update Review{% else %}Submit Review{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Please <a href="{% url 'login' %}">login</a> to leave a review.
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Dynamic Reviews List -->
+                    <div class="reviews-list">
+                        {% if reviews %}
+                            {% for review in reviews %}
+                                <div class="review-item {% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-2">
+                                            {% if review.user.profile_picture %}
+                                                <img src="{{ review.user.profile_picture.url }}" alt="{{ review.user.first_name }}" class="rounded-circle" width="40" height="40">
+                                            {% else %}
+                                                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <i class="fas fa-user text-primary"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ review.user.first_name }} {{ review.user.last_name }}</h6>
+                                            <div class="text-warning">
+                                                {% for i in "12345" %}
+                                                    {% if review.rating >= forloop.counter %}
+                                                        <i class="fas fa-star"></i>
+                                                    {% elif review.rating >= forloop.counter0|add:"0.5" %}
+                                                        <i class="fas fa-star-half-alt"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="ms-auto text-muted small">
+                                            {{ review.created_at|timesince }} ago
+                                        </div>
+                                    </div>
+                                    <p class="mb-0">{{ review.comment }}</p>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="far fa-comment-dots fs-4 text-muted mb-2"></i>
+                                <p class="mb-0 text-muted">No reviews yet. Be the first to review this room!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- Room Details -->
-        <div class="card-body" style="flex: 2; padding: 30px;">
-            <h3 class="card-title mb-3 text-primary" style="font-weight: bold;">Room {{ room.room_number }}</h3>
         
-            <p class="mb-2">
-                <strong class="text-muted">Type:</strong> 
-                <span class="text-dark">{{ room.room_type }}</span>
-            </p>
-        
-            <p class="mb-2">
-                <strong class="text-muted">Price per Night:</strong> 
-                <span class="text-success" style="font-weight: bold;">${{ room.price_per_night }}</span>
-            </p>
-        
-            <p class="mb-2">
-                <strong class="text-muted">Amenities:</strong> 
-                <span class="text-dark">{{ room.amenities }}</span>
-            </p>
-        
-            <p class="mb-2">
-                <strong class="text-muted">Availability:</strong> 
-                {% if room.availability %}
-                    <span class="badge bg-success">Available</span>
-                {% else %}
-                    <span class="badge bg-danger">Not Available</span>
-                {% endif %}
-            </p>
-        
-            <a href="#" class="btn btn-primary mt-4 w-100 rounded-pill" style="font-weight: bold;">Book Now</a>
-        </div>
-        
-
-    </div>
-</div>
-
-<div class="container my-5" style="margin-left: 300px;">
-    <h3 class="mb-4 text-primary">All Bookings Calendar</h3>
-
-    <div class="row mb-3 ">
-        <div class="col-md-8">
-            <input id="booking-calendar" class="form-control" type="text" readonly style="background-color: white; cursor: pointer;">
+        <!-- Sidebar with Calendar -->
+        <div class="col-lg-4">
+            <div class="card border-0 rounded-4 shadow sticky-top" style="top: 20px;">
+                <div class="card-header text-white p-3" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>Availability Calendar
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-muted small mb-3">
+                        <i class="fas fa-info-circle me-1"></i>Dates marked in the calendar are already booked.
+                    </p>
+                    <input id="booking-calendar" class="form-control" type="text" readonly style="background-color: white; cursor: pointer;">
+                    
+                    <div class="mt-4">
+                        <h6 class="text-primary mb-3">Need Help?</h6>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="flex-shrink-0">
+                                <div class="p-2 rounded-circle bg-light">
+                                    <i class="fas fa-phone text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="ms-3">
+                                <p class="mb-0 small">Call us at</p>
+                                <p class="mb-0 fw-bold">+20 123 456 7890</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="p-2 rounded-circle bg-light">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="ms-3">
+                                <p class="mb-0 small">Email us at</p>
+                                <p class="mb-0 fw-bold">bookings@starhotels.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -64,7 +243,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-    
+        // Calendar Setup
         function getDatesBetween(startDate, endDate) {
             const dates = [];
             const currentDate = new Date(startDate);
@@ -94,26 +273,77 @@
             mode: "multiple",
             dateFormat: "Y-m-d",
             defaultDate: allDates,
-            clickOpens: false,   // disable auto open
-            allowInput: false,
-            inline: false        // Now the calendar will act like popup (NOT embedded in page)
+            disable: allDates,
+            clickOpens: true,
+            inline: true
         });
-    
-        // When clicking on input → open the calendar manually
-        calendarInput.addEventListener("click", function(e) {
-            calendar.open();
-            e.stopPropagation();
+        
+        // Star Rating System
+        const stars = document.querySelectorAll('.star-rating');
+        const ratingInput = document.getElementById('rating');
+        
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function() {
+                const rating = this.getAttribute('data-rating');
+                highlightStars(rating);
+            });
+            
+            star.addEventListener('mouseout', function() {
+                const currentRating = ratingInput.value || 0;
+                highlightStars(currentRating);
+            });
+            
+            star.addEventListener('click', function() {
+                const rating = this.getAttribute('data-rating');
+                ratingInput.value = rating;
+                highlightStars(rating);
+            });
         });
-    
-        // Clicking outside → close the calendar
-        document.addEventListener("click", function(e) {
-            const calendarContainer = document.querySelector(".flatpickr-calendar");
-            if (!calendarInput.contains(e.target) && !calendarContainer.contains(e.target)) {
-                calendar.close();
-            }
-        });
-    
+        
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                const starRating = star.getAttribute('data-rating');
+                
+                if (starRating <= rating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                    star.style.color = '#ffc107';
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                    star.style.color = '';
+                }
+            });
+        }
+        
+        // Date validation
+        const checkInDate = document.getElementById('check_in_date');
+        const checkOutDate = document.getElementById('check_out_date');
+        
+        if (checkInDate && checkOutDate) {
+            // Set minimum date to today
+            const today = new Date();
+            const dd = String(today.getDate()).padStart(2, '0');
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const yyyy = today.getFullYear();
+            const todayStr = yyyy + '-' + mm + '-' + dd;
+            
+            checkInDate.setAttribute('min', todayStr);
+            
+            checkInDate.addEventListener('change', function() {
+                checkOutDate.setAttribute('min', this.value);
+                if (checkOutDate.value && checkOutDate.value < this.value) {
+                    checkOutDate.value = this.value;
+                }
+            });
+        }
     });
-    </script>
-    
+</script>
+
+<style>
+    .star-rating {
+        cursor: pointer;
+        margin-right: 5px;
+    }
+</style>
 {% endblock %}

@@ -9,7 +9,9 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False)  # True if the user is an admin
     gender = models.CharField(max_length=10)  
     is_verified = models.BooleanField(default=False)  # True if the user has verified their email
-
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    bio = models.TextField(blank=True, null=True)
+    
     USERNAME_FIELD = 'email'  # Use email as the username field
     REQUIRED_FIELDS = ['username', 'phone_number']
     
@@ -45,4 +47,25 @@ class Booking(models.Model):
     check_out_date = models.DateField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     booking_date = models.DateTimeField(auto_now_add=True)  # Automatically set the date when the booking is made
+
+class Review(models.Model):
+    RATING_CHOICES = (
+        (1, '1 Star'),
+        (2, '2 Stars'),
+        (3, '3 Stars'),
+        (4, '4 Stars'),
+        (5, '5 Stars'),
+    )
     
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.email}'s review for Room {self.room.room_number}"
+
