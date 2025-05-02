@@ -1,0 +1,197 @@
+{% extends 'hotel/base.html' %}
+{% load static %}
+{% block title %}Edit Profile{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-lg border-0 rounded-4 overflow-hidden mb-5">
+        <!-- Header with background -->
+        <div class="text-white p-4 position-relative" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364)">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h3 mb-0 fw-bold">
+              <i class="bi bi-pencil-square me-2"></i>Edit Profile
+            </h2>
+            <a href="{% url 'profile_detail' user.pk %}" class="btn btn-outline-light btn-sm">
+              <i class="bi bi-x-circle"></i> Cancel
+            </a>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <!-- Profile Picture Section -->
+            <div class="mb-4 pb-4 border-bottom text-center">
+              <div class="position-relative d-inline-block mb-3">
+                {% if user.profile_picture %}
+                  <img src="{{ user.profile_picture.url }}" class="rounded-circle img-thumbnail shadow" 
+                       style="width: 180px; height: 180px; object-fit: cover;" alt="{{ user.first_name }}'s profile picture">
+                {% else %}
+                  <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto shadow" 
+                       style="width: 180px; height: 180px; border: 3px solid #f8f9fa;">
+                    <i class="bi bi-person-fill" style="font-size: 5rem; color: #203a43;"></i>
+                  </div>
+                {% endif %}
+                <label for="profile_picture" class="position-absolute bottom-0 end-0 btn btn-sm rounded-circle text-white" 
+                  style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); cursor: pointer;">
+                  <i class="bi bi-camera-fill"></i>
+                </label>
+                <input type="file" name="profile_picture" id="profile_picture" class="d-none" accept="image/*">
+              </div>
+              <small class="text-muted d-block mt-2">Click the camera icon to upload a new profile picture</small>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="mb-4 pb-4 border-bottom">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle p-2 me-2 text-white" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364)">
+                  <i class="bi bi-person-lines-fill"></i>
+                </div>
+                <h5 class="mb-0 fw-bold" style="color: #203a43;">Personal Information</h5>
+              </div>
+              
+              <div class="row g-3">
+                <!-- First Name -->
+                <div class="col-md-6">
+                  <label for="first_name" class="form-label">
+                    <i class="bi bi-person me-2" style="color: #203a43;"></i>First Name
+                  </label>
+                  <input type="text" class="form-control" id="first_name" name="first_name" 
+                         value="{{ user.first_name }}" required>
+                </div>
+                
+                <!-- Last Name -->
+                <div class="col-md-6">
+                  <label for="last_name" class="form-label">
+                    <i class="bi bi-person me-2" style="color: #203a43;"></i>Last Name
+                  </label>
+                  <input type="text" class="form-control" id="last_name" name="last_name" 
+                         value="{{ user.last_name }}" required>
+                </div>
+                
+                <!-- Email -->
+                <div class="col-md-6">
+                  <label for="email" class="form-label">
+                    <i class="bi bi-envelope me-2" style="color: #203a43;"></i>Email Address
+                  </label>
+                  <input type="email" class="form-control" id="email" name="email" 
+                         value="{{ user.email }}" required>
+                </div>
+                
+                <!-- Phone Number -->
+                <div class="col-md-6">
+                  <label for="phone_number" class="form-label">
+                    <i class="bi bi-telephone me-2" style="color: #203a43;"></i>Phone Number
+                  </label>
+                  <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                         value="{{ user.phone_number }}" required>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Additional Information -->
+            <div class="mb-4 pb-4 border-bottom">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle p-2 me-2 text-white" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364)">
+                  <i class="bi bi-info-circle-fill"></i>
+                </div>
+                <h5 class="mb-0 fw-bold" style="color: #203a43;">Additional Information</h5>
+              </div>
+              
+              <div class="row g-3">
+                <!-- Date of Birth -->
+                <div class="col-md-6">
+                  <label for="date_of_birth" class="form-label">
+                    <i class="bi bi-calendar-date me-2" style="color: #203a43;"></i>Date of Birth
+                  </label>
+                  <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+                         value="{{ user.date_of_birth|date:'Y-m-d' }}">
+                </div>
+                
+                <!-- Gender -->
+                <div class="col-md-6">
+                  <label for="gender" class="form-label">
+                    <i class="bi bi-gender-ambiguous me-2" style="color: #203a43;"></i>Gender
+                  </label>
+                  <select class="form-select" id="gender" name="gender">
+                    <option value="" {% if not user.gender %}selected{% endif %}>Select gender</option>
+                    <option value="Male" {% if user.gender == "Male" %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if user.gender == "Female" %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if user.gender == "Other" %}selected{% endif %}>Other</option>
+                  </select>
+                </div>
+                
+                <!-- Bio -->
+                <div class="col-12">
+                  <label for="bio" class="form-label">
+                    <i class="bi bi-card-text me-2" style="color: #203a43;"></i>Bio
+                  </label>
+                  <textarea class="form-control" id="bio" name="bio" rows="4">{{ user.bio }}</textarea>
+                  <small class="form-text text-muted">Tell others about yourself (optional)</small>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Submit Buttons -->
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'profile_detail' user.pk %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Cancel
+              </a>
+              <button type="submit" class="btn text-white" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364)">
+                <i class="bi bi-check-circle me-1"></i> Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add form validation scripts -->
+<script>
+  // Preview uploaded image before form submission
+  document.getElementById('profile_picture').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.querySelector('.rounded-circle.img-thumbnail') || 
+                   document.createElement('img');
+        img.src = e.target.result;
+        img.classList.add('rounded-circle', 'img-thumbnail', 'shadow');
+        img.style.width = '180px';
+        img.style.height = '180px';
+        img.style.objectFit = 'cover';
+        
+        const container = document.querySelector('.position-relative.d-inline-block');
+        if (container.querySelector('.rounded-circle.bg-light')) {
+          container.querySelector('.rounded-circle.bg-light').remove();
+        }
+        if (!container.contains(img)) {
+          container.prepend(img);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  
+  // Form validation
+  (function() {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+      .forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+          form.classList.add('was-validated')
+        }, false)
+      })
+  })()
+</script>
+{% endblock %}

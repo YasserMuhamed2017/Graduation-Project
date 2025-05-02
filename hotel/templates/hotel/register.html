@@ -2,79 +2,180 @@
 {% block title %}Register{% endblock %}
 {% block content %}
 <!-- Registration Page Start -->
-<div class="container mt-5 mb-5">
+<div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm border-0 rounded" style="background-color: #f8f9fa;">
-                <div class="card-body p-4">
-                    <h2 class="text-center mb-4">Register</h2>
+            <div class="card shadow border-0 rounded-3 overflow-hidden">
+                <div class="card-header text-white text-center py-3" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364)">
+                    <h2 class="mb-0"><i class="bi bi-person-plus me-2"></i>Create Account</h2>
+                </div>
+                <div class="card-body p-4 p-sm-5">
                     {% if form.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ form.errors|striptags }}
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>{{ form.errors|striptags }}</div>
                         </div>
                     {% endif %}
-                    <form method="post" action="{% url 'register' %}">
+                    <form method="post" action="{% url 'register' %}" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <div class="row">
-                            <!-- First Column -->
                             <div class="col-md-6 mb-3">
-                                <label for="firstname" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="firstname" name="firstname" required>
+                                <label for="firstname" class="form-label fw-bold"><i class="bi bi-person me-2"></i>First Name</label>
+                                <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter your first name" required>
+                                <div class="invalid-feedback">Please enter your first name.</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="lastname" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="lastname" name="lastname" required>
+                                <label for="lastname" class="form-label fw-bold"><i class="bi bi-person me-2"></i>Last Name</label>
+                                <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter your last name" required>
+                                <div class="invalid-feedback">Please enter your last name.</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <label for="email" class="form-label fw-bold"><i class="bi bi-envelope me-2"></i>Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-at"></i></span>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                                </div>
+                                <div class="invalid-feedback">Please provide a valid email address.</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Phone Number</label>
+                                <label for="phone" class="form-label fw-bold"><i class="bi bi-telephone me-2"></i>Phone Number</label>
                                 <div class="input-group">
                                     <span class="input-group-text" id="phone-country-code">+20</span>
-                                    <input type="text" class="form-control" id="phone" name="phone" aria-describedby="phone-country-code" required>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="10XXXXXXXX" 
+                                           pattern="[0-9]{10}" aria-describedby="phone-country-code" required>
                                 </div>
+                                <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="password1" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password1" name="password1" required>
+                                <label for="password1" class="form-label fw-bold"><i class="bi bi-lock me-2"></i>Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                                    <input type="password" class="form-control" id="password1" name="password1" 
+                                           placeholder="Create a password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword1">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text"><small>Use 8+ characters with a mix of letters, numbers & symbols</small></div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="password2" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="password2" name="password2" required>
+                                <label for="password2" class="form-label fw-bold"><i class="bi bi-lock-fill me-2"></i>Confirm Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+                                    <input type="password" class="form-control" id="password2" name="password2" 
+                                           placeholder="Confirm your password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword2">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback">Passwords must match.</div>
                             </div>
 
-                            <!-- Gender Selection -->
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Gender</label>
+                                <label for="gender" class="form-label fw-bold"><i class="bi bi-gender-ambiguous me-2"></i>Gender</label>
                                 <select class="form-select" id="gender" name="gender" required>
                                     <option value="" disabled selected>Select your gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                     <option value="Other">Other</option>
                                 </select>
+                                <div class="invalid-feedback">Please select your gender.</div>
                             </div>
 
-                            <!-- Date of Birth Selection -->
                             <div class="col-md-6 mb-3">
-                                <label for="dob" class="form-label">Date of Birth</label>
+                                <label for="dob" class="form-label fw-bold"><i class="bi bi-calendar-event me-2"></i>Date of Birth</label>
                                 <input type="date" class="form-control" id="dob" name="date_of_birth" required>
+                                <div class="invalid-feedback">Please select your date of birth.</div>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                                    </label>
+                                    <div class="invalid-feedback">You must agree before submitting.</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn text-white py-2" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364)">
+                                        <i class="bi bi-check-circle me-2"></i>Register
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
-                        <button type="submit" class="btn btn-primary w-25">Register</button>
                     </form>
-                    <p class="mt-3 text-center">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                    <hr class="my-4">
+                    <div class="text-center">
+                        <p class="mb-0">Already have an account? <a href="{% url 'login' %}" class="fw-bold" style="color: #203a43;">Login here</a></p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>  
+    </div>
 </div>
 <!-- Registration Page End -->
+
+<script>
+// Form validation script
+(function () {
+    'use strict'
+    
+    // Fetch all forms we want to apply validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+    
+    // Password confirmation validation
+    var password1 = document.getElementById('password1')
+    var password2 = document.getElementById('password2')
+    
+    if (password1 && password2) {
+        password2.addEventListener('input', function() {
+            if (password1.value !== password2.value) {
+                password2.setCustomValidity('Passwords do not match')
+            } else {
+                password2.setCustomValidity('')
+            }
+        })
+    }
+    
+    // Toggle password visibility
+    document.getElementById('togglePassword1')?.addEventListener('click', function() {
+        togglePasswordVisibility('password1', this)
+    })
+    
+    document.getElementById('togglePassword2')?.addEventListener('click', function() {
+        togglePasswordVisibility('password2', this)
+    })
+    
+    function togglePasswordVisibility(inputId, button) {
+        const input = document.getElementById(inputId)
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password'
+        input.setAttribute('type', type)
+        
+        // Toggle the eye icon
+        const icon = button.querySelector('i')
+        icon.classList.toggle('bi-eye')
+        icon.classList.toggle('bi-eye-slash')
+    }
+    
+    // Loop over forms and prevent submission if invalid
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
 {% endblock %}

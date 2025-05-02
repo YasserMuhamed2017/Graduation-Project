@@ -4,20 +4,24 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login
 from django.contrib.auth import authenticate, logout
 from hotel.models import *
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from .models import Hotel, Room
+from django.utils import timezone
+from .models import Hotel, Room, Review
 from collections import defaultdict
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
+# Remove this import as it conflicts with your custom User model
+# from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 import os
+from django.contrib.auth.decorators import login_required
+from datetime import datetime, timedelta
 
 
 # Create your views here.
@@ -141,7 +145,7 @@ def ajax_hotel_search(request):
         return JsonResponse({'hotels': []})
 
     hotels = Hotel.objects.filter(
-        Q(name__icontains=query) | Q(location__icontains=query)
+        Q(name__icontains=query) | Q(location__icontains(query))
     )
 
     data = []
@@ -222,17 +226,127 @@ def profile_view (request,pk):
     return render(request, 'hotel/profile_detail.html')
 
 
+@login_required
+def edit_profile_view(request, pk):
+    user = User.objects.get(pk=pk)
+    
+    # Check if the logged-in user is trying to edit their own profile
+    if request.user.pk != user.pk:
+        messages.error(request, "You don't have permission to edit this profile.")
+        return redirect('profile_detail', pk=pk)
+    
+    if request.method == 'POST':
+        # Update user information
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.phone_number = request.POST.get('phone_number')
+        user.gender = request.POST.get('gender')
+        date_of_birth = request.POST.get('date_of_birth')
+        if date_of_birth:
+            user.date_of_birth = date_of_birth
+            
+        if request.POST.get('bio'):
+            user.bio = request.POST.get('bio')
+        # Handle profile picture if provided
+        if 'profile_picture' in request.FILES:
+            if hasattr(user, 'profile_picture'):
+                user.profile_picture = request.FILES['profile_picture']
+        
+        user.save()
+        messages.success(request, "Profile updated successfully.")
+        return redirect('profile_detail', pk=pk)
+    
+    return render(request, 'hotel/edit_profile.html', {'user': user})
+
+
 def book_room(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     bookings = room.bookings.all()  # Get all bookings for this room
+    reviews = room.reviews.all()  # Get all reviews for this room
+    
+    # Process amenities to a list for better display
+    room.amenities_list = [amenity.strip() for amenity in room.amenities.split(',')]
+    
     if request.method == 'POST':
-        # Handle booking logic here
-        # For example, you might want to create a booking record in the database
-        # and send a confirmation email to the user.
-        messages.success(request, "Room booked successfully!")
-        return redirect('index')  # Redirect to a success page or hotel detail page
-
-    return render(request, 'hotel/book_room.html', {'room': room, 'bookings': bookings})
+        # Check if it's a booking submission or review submission
+        if 'check_in_date' in request.POST:
+            # Handle booking logic
+            check_in_date = request.POST.get('check_in_date')
+            check_out_date = request.POST.get('check_out_date')
+            
+            # Validate dates
+            if check_in_date and check_out_date:
+                check_in = datetime.strptime(check_in_date, '%Y-%m-%d').date()
+                check_out = datetime.strptime(check_out_date, '%Y-%m-%d').date()
+                
+                # Calculate number of days and total price
+                num_days = (check_out - check_in).days
+                total_price = room.price_per_night * num_days
+                
+                # Create booking if user is authenticated
+                if request.user.is_authenticated:
+                    Booking.objects.create(
+                        room=room,
+                        user=request.user,
+                        check_in_date=check_in,
+                        check_out_date=check_out,
+                        total_price=total_price
+                    )
+                    
+                    # Update room availability
+                    room.availability = False
+                    room.save()
+                    
+                    messages.success(request, "Room booked successfully!")
+                    return redirect('user_reservations')
+                else:
+                    messages.error(request, "You need to be logged in to book a room.")
+                    return redirect('login')
+                    
+        elif 'rating' in request.POST and 'review_text' in request.POST:
+            # Handle review submission
+            if request.user.is_authenticated:
+                rating = request.POST.get('rating')
+                review_text = request.POST.get('review_text')
+                
+                # Validate
+                if rating and review_text:
+                    # Check if user has already reviewed this room
+                    existing_review = Review.objects.filter(room=room, user=request.user).first()
+                    
+                    if existing_review:
+                        # Update existing review
+                        existing_review.rating = rating
+                        existing_review.comment = review_text
+                        existing_review.save()
+                        messages.success(request, "Your review has been updated!")
+                    else:
+                        # Create new review
+                        Review.objects.create(
+                            room=room,
+                            user=request.user,
+                            rating=int(rating),
+                            comment=review_text
+                        )
+                        messages.success(request, "Thank you for your review!")
+                    
+                    # Refresh reviews after adding/updating
+                    reviews = room.reviews.all()
+                else:
+                    messages.error(request, "Please provide both a rating and review text.")
+            else:
+                messages.error(request, "You need to be logged in to submit a review.")
+                return redirect('login')
+    
+    context = {
+        'room': room,
+        'bookings': bookings,
+        'reviews': reviews,
+        'user_has_reviewed': request.user.is_authenticated and Review.objects.filter(room=room, user=request.user).exists()
+    }
+    
+    return render(request, 'hotel/book_room.html', context)
 
 
 # about view
@@ -246,3 +360,95 @@ def about(request):
                 room_images.append(f'/media/room_images/{file_name}')
 
     return render(request, 'hotel/about.html', {'room_images': room_images})
+
+
+@login_required
+def change_password_view(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    
+    # Check if the logged-in user is trying to change their own password
+    if request.user.pk != user.pk:
+        messages.error(request, "You don't have permission to change this user's password.")
+        return redirect('profile_detail', pk=pk)
+    
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Validate input
+        if not current_password or not new_password or not confirm_password:
+            messages.error(request, "All password fields are required.")
+            return render(request, 'hotel/change_password.html')
+            
+        if not check_password(current_password, user.password):
+            messages.error(request, "Your current password is incorrect.")
+            return render(request, 'hotel/change_password.html')
+            
+        if new_password != confirm_password:
+            messages.error(request, "New passwords don't match.")
+            return render(request, 'hotel/change_password.html')
+            
+        if len(new_password) < 8:
+            messages.error(request, "Password must be at least 8 characters long.")
+            return render(request, 'hotel/change_password.html')
+            
+        # Change the password
+        user.password = make_password(new_password)
+        user.save()
+        
+        messages.success(request, "Your password has been changed successfully. Please log in with your new password.")
+        logout(request)  # Log the user out so they can log in with the new password
+        return redirect('login')
+        
+    return render(request, 'hotel/change_password.html', {'user': user})
+
+@login_required
+def user_reservations(request):
+    # Get all bookings for the current logged-in user
+    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+    
+    # Prepare context for the template
+    context = {
+        'bookings': bookings,
+        'active_tab': 'reservations',
+        'now': timezone.now(),  # Add current date for comparison in template
+    }
+    
+    return render(request, 'hotel/user_reservations.html', context)
+
+@login_required
+def cancel_booking(request, booking_id):
+    # Get the booking or return 404 if not found
+    booking = get_object_or_404(Booking, id=booking_id)
+    
+    # Security check - ensure user can only cancel their own bookings
+    if booking.user != request.user:
+        messages.error(request, "You don't have permission to cancel this booking.")
+        return redirect('user_reservations')
+    
+    # Check if the booking is in the future (can only cancel future bookings)
+    if booking.check_in_date <= timezone.now().date():
+        messages.error(request, "Cannot cancel a booking that has already started or completed.")
+        return redirect('user_reservations')
+    
+    # Store booking details for confirmation message
+    hotel_name = booking.room.hotel.name
+    room_number = booking.room.room_number
+    check_in_date = booking.check_in_date.strftime('%b %d, %Y')
+    
+    # Update room availability
+    room = booking.room
+    room.availability = True
+    room.save()
+    
+    # Delete the booking
+    booking.delete()
+    
+    # Notify user of successful cancellation
+    messages.success(
+        request, 
+        f"Your booking at {hotel_name} (Room {room_number}) for {check_in_date} has been cancelled successfully."
+    )
+    
+    return redirect('user_reservations')

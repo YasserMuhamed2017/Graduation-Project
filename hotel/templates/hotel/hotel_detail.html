@@ -7,55 +7,271 @@
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
 <div class="container my-5">
-  
   <div class="container my-5" data-aos="fade-up">
+      <!-- Hotel Image Gallery Section -->
       <div class="row" data-aos="fade-up">
-          <div class="col-md-12 mb-4" style="height:70vh ;width:100 ;overflow:hidden">
-              <img style="height:70vh; width:100%; object-fit: cover;" src="{{ hotel.image.url }}"
-                  class="img-fluid rounded-4 shadow" alt="{{ hotel.name }}">
+          <div class="col-md-12 mb-4 position-relative">
+              <!-- Main Hotel Image with Overlay -->
+              <div style="height:70vh; width:100%; overflow:hidden; position:relative;" class="rounded-4 shadow">
+                  <img style="height:70vh; width:100%; object-fit: cover; filter: brightness(0.9);" src="{{ hotel.image.url }}"
+                      class="img-fluid" alt="{{ hotel.name }}">
+                  
+                  <!-- Elegant Overlay with Hotel Name -->
+                  <div class="position-absolute bottom-0 start-0 w-100 p-4" 
+                       style="background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));">
+                      <div class="container">
+                          <h1 class="text-white fw-bold display-4 mb-0">{{ hotel.name }}</h1>
+                          <p class="text-white mb-2">
+                              <i class="fas fa-map-marker-alt me-2"></i>{{ hotel.location }}
+                          </p>
+                          <div class="mb-2">
+                              {% with rating=hotel.rating %}
+                                {% for i in "12345" %}
+                                  {% if rating >= forloop.counter %}
+                                    <i class="fas fa-star text-warning fs-5"></i>
+                                  {% elif rating >= forloop.counter0|add:"0.5" %}
+                                    <i class="fas fa-star-half-alt text-warning fs-5"></i>
+                                  {% else %}
+                                    <i class="far fa-star text-warning fs-5"></i>
+                                  {% endif %}
+                                {% endfor %}
+                              {% endwith %}
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
-          <div class="col-md-12 mb-4" data-aos="fade-left">
-            <div class="p-4 bg-white rounded-4 shadow-sm border border-light-subtle">
-              <!-- Hotel Name and Location -->
-              <div class="mb-3">
-                <h1 class="fw-bold text-primary mb-1">{{ hotel.name }}</h1>
-                <p class="text-muted mb-0"><i class="fas fa-map-marker-alt me-1 text-primary"></i>{{ hotel.location }}</p>
-              </div>
-
-              <!-- Description -->
-              <div class="mb-3">
-                <h5 class="text-secondary fw-semibold">About</h5>
-                <p class="mb-0">{{ hotel.description }}</p>
-              </div>
-
-              <!-- Contact -->
-              <div class="mb-3">
-                <h5 class="text-secondary fw-semibold">Contact</h5>
-                <p class="mb-0"><i class="fa-solid fa-phone text-primary"></i> {{ hotel.contact_number }}</p>
-              </div>
-
-              <!-- Rating -->
-              <div>
-                <h5 class="text-secondary fw-semibold">Hotel Rating</h5>
-                <div>
-                  {% with rating=hotel.rating %}
-                    {% for i in "12345" %}
-                      {% if rating >= forloop.counter %}
-                        <i class="fas fa-star text-warning"></i>
-                      {% elif rating >= forloop.counter0|add:"0.5" %}
-                        <i class="fas fa-star-half-alt text-warning"></i>
-                      {% else %}
-                        <i class="far fa-star text-warning"></i>
-                      {% endif %}
-                    {% endfor %}
-                  {% endwith %}
+          
+          <!-- Hotel Details Card -->
+          <div class="col-md-12 mb-4" data-aos="fade-up">
+            <div class="p-0 bg-white rounded-4 shadow overflow-hidden">
+              
+              <!-- Hotel Navigation Tabs -->
+              <ul class="nav nav-tabs px-4 pt-3 bg-light" id="hotelDetailsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active fw-semibold" id="overview-tab" data-bs-toggle="tab" 
+                          data-bs-target="#overview" type="button" role="tab" aria-selected="true">
+                    <i class="fas fa-info-circle me-2"></i>Overview
+                  </button>
+                </li>
+                <!-- <li class="nav-item" role="presentation">
+                  <button class="nav-link fw-semibold" id="amenities-tab" data-bs-toggle="tab" 
+                          data-bs-target="#amenities" type="button" role="tab" aria-selected="false">
+                    <i class="fas fa-concierge-bell me-2"></i>Amenities
+                  </button>
+                </li> -->
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link fw-semibold" id="contact-tab" data-bs-toggle="tab" 
+                          data-bs-target="#contact" type="button" role="tab" aria-selected="false">
+                    <i class="fas fa-phone me-2"></i>Contact
+                  </button>
+                </li>
+              </ul>
+              
+              <!-- Tab Content -->
+              <div class="tab-content p-4" id="hotelDetailsTabContent">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <h4 class="text-primary border-bottom pb-2 mb-3">About This Hotel</h4>
+                      <p class="mb-4 fs-5">{{ hotel.description }}</p>
+                      
+                      <div class="d-flex flex-wrap mb-4">
+                        <div class="bg-light rounded-3 p-3 me-3 mb-3 text-center" style="min-width: 100px">
+                          <i class="fas fa-bed text-primary fs-4 mb-2"></i>
+                          <p class="mb-0 small">Premium Rooms</p>
+                        </div>
+                        <div class="bg-light rounded-3 p-3 me-3 mb-3 text-center" style="min-width: 100px">
+                          <i class="fas fa-wifi text-primary fs-4 mb-2"></i>
+                          <p class="mb-0 small">Free WiFi</p>
+                        </div>
+                        <div class="bg-light rounded-3 p-3 me-3 mb-3 text-center" style="min-width: 100px">
+                          <i class="fas fa-utensils text-primary fs-4 mb-2"></i>
+                          <p class="mb-0 small">Restaurant</p>
+                        </div>
+                        <div class="bg-light rounded-3 p-3 me-3 mb-3 text-center" style="min-width: 100px">
+                          <i class="fas fa-parking text-primary fs-4 mb-2"></i>
+                          <p class="mb-0 small">Parking</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                      <div class="card h-100 bg-light border-0">
+                        <div class="card-body">
+                          <h5 class="card-title text-primary mb-3">Hotel Highlights</h5>
+                          <ul class="list-unstyled">
+                            <li class="mb-2">
+                              <i class="fas fa-check-circle text-success me-2"></i>
+                              <span>24/7 Front Desk</span>
+                            </li>
+                            <li class="mb-2">
+                              <i class="fas fa-check-circle text-success me-2"></i>
+                              <span>Air Conditioning</span>
+                            </li>
+                            <li class="mb-2">
+                              <i class="fas fa-check-circle text-success me-2"></i>
+                              <span>Non-smoking Rooms</span>
+                            </li>
+                            <li class="mb-2">
+                              <i class="fas fa-check-circle text-success me-2"></i>
+                              <span>Family Rooms</span>
+                            </li>
+                            <li class="mb-2">
+                              <i class="fas fa-check-circle text-success me-2"></i>
+                              <span>Daily Housekeeping</span>
+                            </li>
+                          </ul>
+                          <div class="mt-4">
+                            <h6 class="text-dark">Guest Rating</h6>
+                            <div class="d-flex align-items-center">
+                              <span class="bg-primary text-white rounded-2 px-2 py-1 me-2">{{ hotel.rating }}</span>
+                              <div>
+                                {% with rating=hotel.rating %}
+                                  {% for i in "12345" %}
+                                    {% if rating >= forloop.counter %}
+                                      <i class="fas fa-star text-warning"></i>
+                                    {% elif rating >= forloop.counter0|add:"0.5" %}
+                                      <i class="fas fa-star-half-alt text-warning"></i>
+                                    {% else %}
+                                      <i class="far fa-star text-warning"></i>
+                                    {% endif %}
+                                  {% endfor %}
+                                {% endwith %}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Amenities Tab -->
+                <div class="tab-pane fade" id="amenities" role="tabpanel">
+                  <h4 class="text-primary border-bottom pb-2 mb-4">Hotel Amenities</h4>
+                  <div class="row g-4">
+                    <div class="col-md-6">
+                      <h5 class="mb-3"><i class="fas fa-swimmer text-primary me-2"></i>Recreation</h5>
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Swimming Pool
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Fitness Center
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Spa & Wellness
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mb-3"><i class="fas fa-concierge-bell text-primary me-2"></i>Services</h5>
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Room Service
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Airport Shuttle
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Laundry Service
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mb-3"><i class="fas fa-utensils text-primary me-2"></i>Food & Drink</h5>
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Restaurant
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Bar/Lounge
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Breakfast Available
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-md-6">
+                      <h5 class="mb-3"><i class="fas fa-business-time text-primary me-2"></i>Business</h5>
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Conference Rooms
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Business Center
+                        </li>
+                        <li class="list-group-item bg-transparent px-0">
+                          <i class="fas fa-check-circle text-success me-2"></i>Meeting Facilities
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Contact Tab -->
+                <div class="tab-pane fade" id="contact" role="tabpanel">
+                  <h4 class="text-primary border-bottom pb-2 mb-4">Contact Information</h4>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                          <div class="p-3 rounded-circle bg-primary bg-opacity-10">
+                            <i class="fas fa-phone text-primary fs-4"></i>
+                          </div>
+                        </div>
+                        <div class="ms-3">
+                          <h5>Phone Number</h5>
+                          <p class="mb-0 fs-5">{{ hotel.contact_number }}</p>
+                        </div>
+                      </div>
+                      
+                      <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                          <div class="p-3 rounded-circle bg-primary bg-opacity-10">
+                            <i class="fas fa-envelope text-primary fs-4"></i>
+                          </div>
+                        </div>
+                        <div class="ms-3">
+                          <h5>Email</h5>
+                          <p class="mb-0 fs-5">info@{{ hotel.name|lower|cut:" " }}.com</p>
+                        </div>
+                      </div>
+                      
+                      <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                          <div class="p-3 rounded-circle bg-primary bg-opacity-10">
+                            <i class="fas fa-map-marker-alt text-primary fs-4"></i>
+                          </div>
+                        </div>
+                        <div class="ms-3">
+                          <h5>Address</h5>
+                          <p class="mb-0 fs-5">{{ hotel.location }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                      <div class="ratio ratio-4x3">
+                        <iframe 
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d110502.76857849018!2d31.16880733353574!3d30.05946481323257!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14583fa60b21beeb%3A0x79dfb296e8423bba!2z2KfZhNmC2KfZh9ix2KnYjCDZhdit2KfZgdi42Kkg2KfZhNmC2KfZh9ix2KnigKw!5e0!3m2!1sar!2seg!4v1694014155478!5m2!1sar!2seg" 
+                          style="border:0;" 
+                          allowfullscreen="" 
+                          loading="lazy" 
+                          referrerpolicy="no-referrer-when-downgrade"
+                          class="rounded-4 shadow">
+                        </iframe>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
       </div>
     </div>
-
 </div>
 
 <!-- Search Form -->

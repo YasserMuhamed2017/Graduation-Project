@@ -78,23 +78,26 @@
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
             <li class="nav-item">
               <a
-                class="nav-link text-light fw-semibold"
-                href="{% url 'index' %}"
-                >Home</a
+              class="nav-link text-light fw-semibold"
+              href="{% url 'index' %}"
+              >Home</a
               >
             </li>
             <li class="nav-item">
               <a
-                class="nav-link text-light fw-semibold"
-                href="{% url 'about' %}"
-                >About Us</a
+              class="nav-link text-light fw-semibold"
+              href="{% url 'about' %}"
+              >About Us</a
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-light fw-semibold" href="#">Services</a>
+              <a 
+              class="nav-link text-light fw-semibold" 
+              href="{% url 'about' %}#services"
+              >Services</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-light fw-semibold" href="#">Contact</a>
+              <a class="nav-link text-light fw-semibold" href="{% url 'about' %}#contact">Contact</a>
             </li>
           </ul>
 
@@ -118,7 +121,7 @@
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="#"
+                <a class="dropdown-item" href="{% url 'user_reservations' %}"
                   ><i class="bi bi-folder2-open"></i> My Reservation</a
                 >
               </li>
