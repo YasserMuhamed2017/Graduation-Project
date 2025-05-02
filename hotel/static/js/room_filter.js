@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
   
+// animate on scroll
+AOS.init({
+  duration: 2000,
+  once: false
+});
+
 
 //   document.addEventListener('DOMContentLoaded', function () {
 //     const roomTypeContainer = document.getElementById('room_type');

@@ -1,34 +1,70 @@
+<style>
+  .room-img {
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .card:hover .room-img {
+    transform: scale(1.05);
+  }
+
+  .transform-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+  }
+
+  .btn {
+    background:  #0f2027;
+    color: white;
+    transition: 0.3s ease-in;
+  }
+
+  .btn:hover{
+    background-color: #2c5364;
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .room-img {
+      height: 180px;
+    }
+  }
+</style>
+
+
 {% for room in rooms %}
-  <div class="col-md-4">
-    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+<div class="col-md-4">
+  <div class="card h-100 border-0 rounded-4 overflow-hidden shadow-sm transition transform-hover"
+    style="transition: all 0.3s ease;">
 
-      {% if room.room_image %}
-        <img src="{{ room.room_image.url }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="">
-      {% else %}
-        <img src="static/img/grand.png" class="card-img-top" style="height: 250px; object-fit: cover;" alt="">
-      {% endif %}
+    {% if room.room_image %}
+    <img src="{{ room.room_image.url }}" class="card-img-top room-img" alt="">
+    {% else %}
+    <img src="/static/img/grand.png" class="card-img-top room-img" alt="">
+    {% endif %}
 
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{ room.room_type }} Room - {{ room.room_number }}</h5>
-        <p class="card-text"><strong>Price:</strong> ${{ room.price_per_night }}</p>
-        <p class="card-text"><strong>Amenities:</strong> {{ room.amenities }}</p>
-        <p class="card-text">
-          <strong>Status:</strong>
-          {% if room.availability %}
-            <span class="badge bg-success">Available</span>
-          {% else %}
-            <span class="badge bg-danger">Not Available</span>
-          {% endif %}
-        </p>
-        <div class="mt-auto">
-          <a href="{% url 'book_room' room.id %}" class="btn btn-outline-primary w-100 rounded-pill">View Room</a>
-        </div>
+    <div class="card-body d-flex flex-column bg-light-subtle">
+      <h5 class="card-title text-primary-emphasis">{{ room.room_type }} Room - {{ room.room_number }}</h5>
+      <p class="card-text"><strong>Price:</strong> <span class="text-success">${{ room.price_per_night }}</span></p>
+      <p class="card-text"><strong>Amenities:</strong> {{ room.amenities }}</p>
+      <p class="card-text">
+        <strong>Status:</strong>
+        {% if room.availability %}
+        <span class="badge bg-success bg-gradient">Available</span>
+        {% else %}
+        <span class="badge bg-danger bg-gradient">Not Available</span>
+        {% endif %}
+      </p>
+      <div class="mt-auto">
+        <a href="{% url 'book_room' room.id %}" class="btn w-100 rounded-pill shadow-sm">View Room</a>
       </div>
-
     </div>
   </div>
+
+</div>
 {% empty %}
-  <div class="col-12 text-center">
-    <p class="text-muted">No rooms found matching your filters.</p>
-  </div>
+<div class="col-12 text-center">
+  <p class="text-muted">No rooms found matching your filters.</p>
+</div>
 {% endfor %}
