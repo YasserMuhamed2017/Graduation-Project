@@ -1,0 +1,359 @@
+{% extends 'hotel/base.html' %}
+{% load static %}
+
+{% block title %}About Page{% endblock %}
+
+{% block content %}
+
+
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<!-- AOS CSS -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+  html,
+  body {
+    overflow-x: hidden !important;
+
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  .btn{
+    background-color: white;
+
+    
+  }
+  .btn:hover{
+    background-color: #1e1e2f;
+    
+    color: white;
+  }
+</style>
+
+<body>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero-section d-flex align-items-center justify-content-center text-white text-center">
+    <div class="container position-relative z-2">
+      <h1 class="display-4">Welcome to Star Hotels</h1>
+      <p class="lead">Book your dream room now</p>
+      <a href="#" class="btn btn-lg mt-3">View Rooms</a>
+    </div>
+    <div class="bg-layer" id="bg1"></div>
+    <div class="bg-layer" id="bg2"></div>
+  </section>
+
+
+
+  <section id="our-rooms" class="py-5 bg-light text-center" data-aos="fade-up">
+    <div class="container">
+      <h2 class="section-title">Our Rooms</h2>
+
+      <div id="roomCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+
+        <div class="carousel-inner">
+
+          {% for img in room_images %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <img src="{{ img }}" class="d-block w-100" alt="Room image">
+          </div>
+          {% endfor %}
+
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- About Section -->
+  <section id="about" class="text-center" data-aos="zoom-in">
+    <div class="container">
+      <h2 class="section-title">About Us</h2>
+      <div class="row align-items-center">
+        <div class="col-md-6" data-aos="fade-right">
+          <img src="/static/img/about-us-1-1.jpg" class="img-fluid rounded shadow" alt="About">
+        </div>
+        <div class="col-md-6" data-aos="fade-left">
+          <h5>
+            We are a modern hotel room booking platform that helps travelers find the best rooms at competitive prices.
+            Our system is simple, fast, and reliable — connecting you with trusted hotels across Egypt.
+          </h5>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" data-aos="fade-right">
+    <div class="container text-center">
+      <h2 class="section-title2">Our Services</h2>
+      <div class="row g-4">
+        <div class="col-md-4" data-aos="zoom-in">
+          <div class="service-card-modern h-100">
+            <img src="/static/img/bar-chart.png" width="60" alt="Room Booking">
+            <h5 class="mt-3">Room Booking</h5>
+            <p>Book hotel rooms easily from multiple cities in Egypt.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="zoom-in" data-aos-delay="150">
+          <div class="service-card-modern h-100">
+            <img src="/static/img/speed.png" width="60" alt="Hotel Comparison">
+            <h5 class="mt-3">Hotel Comparison</h5>
+            <p>Compare prices, ratings, and availability in real-time.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
+          <div class="service-card-modern h-100">
+            <img src="/static/img/monitor.png" width="60" alt="Customer Support">
+            <h5 class="mt-3">Customer Support</h5>
+            <p>24/7 support to assist with your bookings and inquiries.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section id="features" class="text-center" data-aos="fade-up">
+    <h2 class="section-title">Why Choose Us</h2>
+    <div class="container py-5">
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4" data-aos="fade-up">
+          <div class="card h-100 text-center shadow-sm card-setting-hover">
+            <img src="/static/img/bar-time.png" class="card-img-top w-25 mx-auto mt-4" alt="Phone">
+            <div class="card-body">
+              <h5 class="card-title">Real time stats, Right away.</h5>
+              <p class="card-text">What you see is what you get, instantly.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100 text-center shadow-sm card-setting-hover">
+            <img src="/static/img/dashboard.png" class="card-img-top w-25 mx-auto mt-4" alt="Speed">
+            <div class="card-body">
+              <h5 class="card-title">Options to go on, Forever.</h5>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100 text-center shadow-sm card-setting-hover">
+            <img src="/static/img/bar-chart.png" class="card-img-top w-25 mx-auto mt-4" alt="Settings">
+            <div class="card-body">
+              <h5 class="card-title">Real-Time Availability</h5>
+              <p class="card-text">What you see is what you get, instantly.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="card h-100 text-center shadow-sm card-setting-hover">
+            <img src="/static/img/bar-chart.png" class="card-img-top w-25 mx-auto mt-4" alt="Dashboard">
+            <div class="card-body">
+              <h5 class="card-title">Modern Interface</h5>
+              <p class="card-text">Designed to work beautifully on all devices.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+          <div class="card h-100 text-center shadow-sm card-setting-hover">
+            <img src="/static/img/bar-chart.png" class="card-img-top w-25 mx-auto mt-4" alt="Instructor">
+            <div class="card-body">
+              <h5 class="card-title">Verified Hotels</h5>
+              <p class="card-text">We partner only with licensed hotels.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="500">
+          <div class="card h-100 text-center shadow-sm card-setting-hover">
+            <img src="/static/img/bar-chart.png" class="card-img-top w-25 mx-auto mt-4" alt="WIFI">
+            <div class="card-body">
+              <h5 class="card-title">Secure Booking</h5>
+              <p class="card-text">All transactions are protected and encrypted.</p>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- Team Section -->
+  <section class="team text-center" data-aos="zoom-out">
+    <div class="container">
+      <h2 class="section-title">Our Team</h2>
+      <div class="team">
+        <div class="team_member" data-aos="zoom-in">
+          <div class="img-con">
+            <div class="layer-social">
+              <a href="https://github.com/YasserMuhamed2017/Graduation-Project">
+                <i class="fab fa-facebook-f"></i>
+                <i class="fab fa-whatsapp"></i>
+                <i class="fab fa-twitter"></i>
+              </a>
+            </div>
+            <img src="/static/img/person2.jpg" style="width: 100%;">
+          </div>
+          <div class="team_item_info">
+            <h3>Muhammed Ali</h3>
+            <span>Web Designer</span>
+          </div>
+        </div>
+
+        <div class="team_member" data-aos="zoom-in">
+          <div class="img-con">
+            <div class="layer-social">
+              <a href="https://github.com/YasserMuhamed2017/Graduation-Project">
+                <i class="fab fa-facebook-f"></i>
+                <i class="fab fa-whatsapp"></i>
+                <i class="fab fa-twitter"></i>
+              </a>
+            </div>
+            <img src="/static/img/person4.jpg" style="width: 100%;">
+          </div>
+          <div class="team_item_info">
+            <h3>Omar Sadek</h3>
+            <span>Backend Developer</span>
+          </div>
+        </div>
+
+        <div class="team_member" data-aos="zoom-in">
+          <div class="img-con">
+            <div class="layer-social">
+              <a href="https://github.com/YasserMuhamed2017/Graduation-Project">
+                <i class="fab fa-facebook-f"></i>
+                <i class="fab fa-whatsapp"></i>
+                <i class="fab fa-twitter"></i>
+              </a>
+            </div>
+            <img src="/static/img/person13.png" style="width: 100%;">
+          </div>
+          <div class="team_item_info">
+            <h3>Abdallah Mahany</h3>
+            <span>Backend Developer</span>
+          </div>
+        </div>
+
+        <div class="team_member" data-aos="zoom-in">
+          <div class="img-con">
+            <div class="layer-social">
+              <a href="https://github.com/YasserMuhamed2017/Graduation-Project">
+                <i class="fab fa-facebook-f"></i>
+                <i class="fab fa-whatsapp"></i>
+                <i class="fab fa-twitter"></i>
+              </a>
+            </div>
+            <img src="/static/img/person19.png" style="width: 100%;">
+          </div>
+          <div class="team_item_info">
+            <h3>Yasser Mohammed</h3>
+            <span>backend Developer</span>
+          </div>
+        </div>
+
+        <div class="team_member" data-aos="zoom-in">
+          <div class="img-con">
+            <div class="layer-social">
+              <a href="https://github.com/YasserMuhamed2017/Graduation-Project">
+                <i class="fab fa-facebook-f"></i>
+                <i class="fab fa-whatsapp"></i>
+                <i class="fab fa-twitter"></i>
+              </a>
+            </div>
+            <img src="/static/img/person30.png" style="width: 100%;">
+          </div>
+          <div class="team_item_info">
+            <h3>Fathy El-badrawy</h3>
+            <span>Web Developer</span>
+          </div>
+        </div>
+
+        <div class="team_member" data-aos="zoom-in">
+          <div class="img-con">
+            <div class="layer-social">
+              <a href="https://github.com/YasserMuhamed2017/Graduation-Project">
+                <i class="fab fa-facebook-f"></i>
+                <i class="fab fa-whatsapp"></i>
+                <i class="fab fa-twitter"></i>
+              </a>
+            </div>
+            <img src="/static/img/person19.png" style="width: 100%;">
+          </div>
+          <div class="team_item_info">
+            <h3>ITI Benha</h3>
+            <span>Mobile Developer</span>
+          </div>
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-5 bg-gradient" data-aos="fade-up" style="background: linear-gradient(135deg, #e3f2fd, #fce4ec);">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h4 class="section-title fw-bold text-primary-emphasis display-6">Get in Touch</h4>
+        <p class="text-muted">We’d love to hear from you! Fill out the form and we’ll get back to you shortly.</p>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <form class="contact-form p-4 p-md-5 bg-white rounded-4 shadow-lg" data-aos="zoom-in">
+            <div class="mb-3">
+              <input type="text" class="form-control form-control-lg rounded-pill" placeholder="Your Name" required>
+            </div>
+            <div class="mb-3">
+              <input type="email" class="form-control form-control-lg rounded-pill" placeholder="Email Address" required>
+            </div>
+            <div class="mb-3">
+              <textarea class="form-control form-control-lg rounded-4" rows="5" placeholder="Your Message" required></textarea>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm" style="background: #0f2027; border: none;">
+                <i class="fas fa-paper-plane me-2"></i> Send Message
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  
+  <!-- Scripts -->
+  <!-- AOS JS -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script src="/static/js/home.js"></script>
+
+
+</body>
+
+{% endblock %}
