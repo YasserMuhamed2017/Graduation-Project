@@ -269,13 +269,63 @@
     
         const calendarInput = document.getElementById("booking-calendar");
     
+        // Update the flatpickr configuration
         const calendar = flatpickr(calendarInput, {
-            mode: "multiple",
+            mode: "range",  // Changed from "multiple" to "range" for date range selection
             dateFormat: "Y-m-d",
-            defaultDate: allDates,
+            defaultDate: [],
             disable: allDates,
             clickOpens: true,
-            inline: true
+            inline: true,
+            minDate: "today",  // Prevent selecting dates in the past
+            // Add this to highlight the booked dates in red
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                // Check if this day is in the disabled dates (booked dates)
+                if (allDates.includes(dayElem.dateObj.toISOString().split('T')[0])) {
+                    // Add a class to highlight booked dates
+                    dayElem.className += " booked-date";
+                }
+            },
+            onChange: function(selectedDates, dateStr, instance) {
+                // When dates are selected in the calendar
+                if (selectedDates.length === 1) {
+                    // First date selected (check-in)
+                    checkInDate.value = formatDate(selectedDates[0]);
+                    // Reset check-out date when new check-in is selected
+                    checkOutDate.value = "";
+                } else if (selectedDates.length === 2) {
+                    // Both dates selected (check-in and check-out)
+                    checkInDate.value = formatDate(selectedDates[0]);
+                    checkOutDate.value = formatDate(selectedDates[1]);
+                }
+            }
+        });
+        
+        // Helper function to format dates as YYYY-MM-DD
+        function formatDate(date) {
+            const d = new Date(date);
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Sync form inputs with calendar
+        checkInDate.addEventListener('change', function() {
+            const dates = [];
+            if (this.value) {
+                dates.push(this.value);
+                if (checkOutDate.value) {
+                    dates.push(checkOutDate.value);
+                }
+                calendar.setDate(dates);
+            }
+        });
+        
+        checkOutDate.addEventListener('change', function() {
+            if (checkInDate.value && this.value) {
+                calendar.setDate([checkInDate.value, this.value]);
+            }
         });
         
         // Star Rating System
@@ -341,9 +391,31 @@
 </script>
 
 <style>
+    /* Existing styles */
     .star-rating {
         cursor: pointer;
         margin-right: 5px;
+    }
+    
+    /* New styles for the calendar */
+    .flatpickr-day.booked-date {
+        background-color: #ffebee;  /* Light red background */
+        color: #f44336;             /* Red text */
+        border-color: #ffcdd2;      /* Light red border */
+        font-weight: bold;
+    }
+    
+    .flatpickr-day.booked-date:hover {
+        background-color: #ffcdd2;  /* Slightly darker red on hover */
+    }
+    
+    /* This ensures the disabled dates are still visible as red */
+    .flatpickr-day.disabled.booked-date {
+        background-color: #ffebee !important;
+        color: #f44336 !important;
+        border-color: #ffcdd2 !important;
+        text-decoration: line-through;
+        opacity: 0.8;
     }
 </style>
 {% endblock %}

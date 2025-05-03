@@ -22,9 +22,12 @@ class Hotel(models.Model):
     contact_number = models.CharField(max_length=15, unique=True)
     name = models.CharField(max_length=50)
     location = models.CharField(max_length=100)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     description = models.TextField()
     rating = models.DecimalField(max_digits=3, decimal_places=2)
     image = models.ImageField(upload_to='hotel_images/')  # Image field for hotel images
+    is_selected = models.BooleanField(default=False)  # True if the hotel is selected for special offers or promotions
 
 class Room(models.Model):
     choices = (

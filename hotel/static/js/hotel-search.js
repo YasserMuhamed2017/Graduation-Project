@@ -46,8 +46,6 @@ searchInput.addEventListener('input', function () {
         });
 });
 
-
-
 // animate on scroll
 AOS.init({
   duration: 2000,

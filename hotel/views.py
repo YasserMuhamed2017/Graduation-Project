@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 
 # Create your views here.
 def index(request):
-    hotels = Hotel.objects.all()  
+    hotels = Hotel.objects.filter(is_selected=False)  # Get only selected hotels
     return render(request, 'hotel/index.html', {'hotels': hotels})
 
 def login_view(request):
@@ -141,13 +141,10 @@ def logout_view(request):
 # AJAX Hotel Search
 def ajax_hotel_search(request):
     query = request.GET.get('location', '').strip()
-    if not query:
-        return JsonResponse({'hotels': []})
 
     hotels = Hotel.objects.filter(
-        Q(name__icontains=query) | Q(location__icontains(query))
+        Q(name__icontains=query) | Q(location__icontains=query)
     )
-
     data = []
     for hotel in hotels:
         data.append({
@@ -158,6 +155,9 @@ def ajax_hotel_search(request):
             'contact_number': hotel.contact_number,
             'image_url': hotel.image.url if hotel.image else '',
         })
+
+    if not query:
+        return JsonResponse({'hotels': data})
 
     return JsonResponse({'hotels': data})
 
@@ -213,7 +213,6 @@ def ajax_filter_rooms(request, hotel_id):
 
 
 def profile_view (request,pk):
-    
     if request.method == 'POST':
         user = request.user
         user.first_name = request.POST.get('first_name')
@@ -407,11 +406,13 @@ def change_password_view(request, pk):
 def user_reservations(request):
     # Get all bookings for the current logged-in user
     bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+    total_spent = sum(booking.total_price for booking in bookings)
     
     # Prepare context for the template
     context = {
         'bookings': bookings,
         'active_tab': 'reservations',
+        'total_spent': total_spent,
         'now': timezone.now(),  # Add current date for comparison in template
     }
     
@@ -452,3 +453,62 @@ def cancel_booking(request, booking_id):
     )
     
     return redirect('user_reservations')
+
+@login_required
+def delete_account(request, pk):
+    """View function to handle account deletion."""
+    user = get_object_or_404(User, pk=pk)
+    
+    # Check if the logged-in user is trying to delete their own account
+    if request.user.pk != user.pk:
+        messages.error(request, "You don't have permission to delete this account.")
+        return redirect('profile_detail', pk=pk)
+    
+    # Prevent deletion of admin accounts through this view as an extra security measure
+    if user.is_admin or user.is_superuser:
+        messages.error(request, "Admin accounts cannot be deleted through this interface.")
+        return redirect('profile_detail', pk=pk)
+    
+    if request.method == 'POST':
+        # Check for confirmation
+        confirmation = request.POST.get('confirmation')
+        if confirmation == 'DELETE':
+            # Delete related data
+            # The on_delete=CASCADE should handle related objects automatically
+            
+            # Logout the user before deleting
+            logout(request)
+            
+            # Delete the user account
+            user.delete()
+            
+            messages.success(request, "Your account has been permanently deleted.")
+            return redirect('index')
+        else:
+            messages.error(request, "Incorrect confirmation. Account was not deleted.")
+            return redirect('delete_account_confirm', pk=pk)
+    
+    # GET request redirects to confirmation page
+    return redirect('delete_account_confirm', pk=pk)
+
+@login_required
+def delete_account_confirm(request, pk):
+    """Display confirmation page for account deletion."""
+    user = get_object_or_404(User, pk=pk)
+    
+    # Check if the logged-in user is trying to delete their own account
+    if request.user.pk != user.pk:
+        messages.error(request, "You don't have permission to delete this account.")
+        return redirect('profile_detail', pk=pk)
+    
+    # Prevent deletion of admin accounts
+    if user.is_admin or user.is_superuser:
+        messages.error(request, "Admin accounts cannot be deleted.")
+        return redirect('profile_detail', pk=pk)
+    
+    return render(request, 'hotel/delete_account_confirm.html', {'user': user})
+
+def hotels_list(request):
+    """View function to display all hotels."""
+    hotels = Hotel.objects.all()
+    return render(request, 'hotel/hotels_list.html', {'hotels': hotels})
