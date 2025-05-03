@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 
 # Create your views here.
 def index(request):
-    hotels = Hotel.objects.filter(is_selected=False)  # Get only selected hotels
+    hotels = Hotel.objects.all()  
     return render(request, 'hotel/index.html', {'hotels': hotels})
 
 def login_view(request):
