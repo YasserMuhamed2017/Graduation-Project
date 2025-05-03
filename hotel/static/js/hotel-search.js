@@ -1,20 +1,20 @@
 const searchInput = document.getElementById('searchInput');
 const resultsContainer = document.getElementById('default-hotels');
 const searchTitle = document.getElementById('searchTitle');
+const selectedHotels = document.getElementById('selected-hotels');
 
 searchInput.addEventListener('input', function () {
     const query = searchInput.value.trim();
 
     fetch(`/hotel/ajax/hotel-search/?location=${encodeURIComponent(query)}`)
-
         .then(response => response.json())
         .then(data => {
             resultsContainer.innerHTML = '';
 
             if (!query) {
-                searchTitle.textContent = 'All Hotels';
-            } else {
-                searchTitle.textContent = `Search Results for "${query}"`;
+                searchTitle.innerHTML = '';
+                resultsContainer.innerHTML = '';
+                return;
             }
 
             if (data.hotels.length === 0) {
@@ -22,6 +22,7 @@ searchInput.addEventListener('input', function () {
                 return;
             }
 
+            searchTitle.innerHTML = 'Search Result for "' + query + '"';
             data.hotels.forEach(hotel => {
                 const hotelCard = `
             <div class="col-md-4">
@@ -43,11 +44,57 @@ searchInput.addEventListener('input', function () {
           `;
                 resultsContainer.innerHTML += hotelCard;
             });
+
         });
 });
-
 // animate on scroll
 AOS.init({
   duration: 2000,
   once: false
+});
+
+
+var swiper = new Swiper(".slide-swp", {
+  pagination: {
+      el: ".swiper-pagination",
+      dynamicBullests:true,
+      clickable:true
+  },
+  autoplay:{
+      delay:4000,
+  },
+  loop:true,
+});
+
+
+// Initialize Swiper for Selected Hotels
+var swiper = new Swiper(".slide-product", {
+  slidesPerView: 3,
+  spaceBetween: 20,
+  navigation: {
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev"
+  },
+  autoplay: {
+    delay: 4000,
+  },
+  loop: true,
+  breakpoints: {
+    1200: {
+      slidesPerView: 3,
+      spaceBetween: 20
+    },
+    1000: {
+      slidesPerView: 3,
+      spaceBetween: 20
+    },
+    700: {
+      slidesPerView: 2,
+      spaceBetween: 15
+    },
+    0: {
+      slidesPerView: 1,
+      spaceBetween: 10
+    }
+  }
 });
