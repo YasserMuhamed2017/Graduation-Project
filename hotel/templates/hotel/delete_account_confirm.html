@@ -1,0 +1,47 @@
+{% extends "hotel/base.html" %}
+{% block content %}
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card border-danger shadow">
+        <div class="card-header bg-danger text-white">
+          <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Delete Account Confirmation</h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <h4 class="alert-heading">Warning! This action cannot be undone.</h4>
+            <p>You are about to permanently delete your account. This will:</p>
+            <ul>
+              <li>Delete all your personal information</li>
+              <li>Cancel all your current bookings</li>
+              <li>Remove your reviews and ratings</li>
+              <li>Permanently delete your profile</li>
+            </ul>
+            <p class="mb-0">Once deleted, we cannot recover this data.</p>
+          </div>
+          
+          <form method="post" action="{% url 'delete_account' user.pk %}" class="mt-4">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+              <label for="confirmation" class="form-label">To confirm deletion, please type <strong>DELETE</strong> in the box below:</label>
+              <input type="text" id="confirmation" name="confirmation" class="form-control form-control-lg" required>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{% url 'profile_detail' user.pk %}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-danger btn-lg">
+                <i class="fas fa-trash-alt me-2"></i>Delete My Account
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

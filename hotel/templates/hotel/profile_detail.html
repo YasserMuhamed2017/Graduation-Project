@@ -217,7 +217,7 @@
                     <span class="d-block mt-1 text-danger">Permanently delete your account and associated data</span>
                   </div>
                   {% if not user.is_admin and not user.is_superuser %}
-                  <a href="#" class="btn btn-outline-danger btn-sm">
+                  <a href="{% url 'delete_account_confirm' user.pk %}" class="btn btn-outline-danger btn-sm">
                     <i class="bi bi-trash me-1"></i> Delete Account
                   </a>
                   {% else %}

@@ -189,7 +189,7 @@
                     </div>
                     <div class="text-center mt-2">
                       {% with upcoming_count=bookings|dictsortreversed:"check_in_date"|length %}
-                      <span class="display-4 fw-bold">{{ upcoming_count }}</span>
+                      <span class="display-6 fw-bold">{{ upcoming_count }}</span>
                       <p class="text-muted mb-0">Upcoming Reservations</p>
                       {% endwith %}
                     </div>
@@ -206,13 +206,8 @@
                       <h6 class="mb-0 fw-bold">Total Spent</h6>
                     </div>
                     <div class="text-center mt-2">
-                      {% with total=0 %}
-                        {% for booking in bookings %}
-                          {% with total=total|add:booking.total_price %}{% endwith %}
-                        {% endfor %}
-                        <span class="display-4 fw-bold">${{ total|floatformat:2 }}</span>
-                        <p class="text-muted mb-0">Overall Spending</p>
-                      {% endwith %}
+                      <span class="display-6 fw-bold">${{ total_spent|floatformat:2 }}</span>
+                      <p class="text-muted mb-0">Overall Spending</p>
                     </div>
                   </div>
                 </div>
@@ -227,7 +222,7 @@
                       <h6 class="mb-0 fw-bold">Reservation History</h6>
                     </div>
                     <div class="text-center mt-2">
-                      <span class="display-4 fw-bold">{{ bookings|length }}</span>
+                      <span class="display-6 fw-bold">{{ bookings|length }}</span>
                       <p class="text-muted mb-0">Total Bookings</p>
                     </div>
                   </div>
