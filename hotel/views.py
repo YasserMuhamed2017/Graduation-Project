@@ -26,8 +26,10 @@ from datetime import datetime, timedelta
 
 # Create your views here.
 def index(request):
-    hotels = Hotel.objects.all()  
-    return render(request, 'hotel/index.html', {'hotels': hotels})
+    hotels = Hotel.objects.all()
+    top_hotels = Hotel.objects.order_by('-rating')[:5]
+    context = {'top_hotels': top_hotels , 'hotels': hotels}  
+    return render(request, 'hotel/index.html', context)
 
 def login_view(request):
     return render(request, 'hotel/login.html')
@@ -154,6 +156,7 @@ def ajax_hotel_search(request):
             'description': hotel.description[:50] + '...',
             'contact_number': hotel.contact_number,
             'image_url': hotel.image.url if hotel.image else '',
+            'rating': hotel.rating,
         })
 
     if not query:
@@ -278,7 +281,7 @@ def book_room(request, room_id):
             if check_in_date and check_out_date:
                 check_in = datetime.strptime(check_in_date, '%Y-%m-%d').date()
                 check_out = datetime.strptime(check_out_date, '%Y-%m-%d').date()
-                
+
                 # Calculate number of days and total price
                 num_days = (check_out - check_in).days
                 total_price = room.price_per_night * num_days

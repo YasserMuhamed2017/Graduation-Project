@@ -1,28 +1,35 @@
-{% extends "hotel/base.html" %}
-{% load static %}
-
-{% block title %}All Hotels - Star Hotels{% endblock %}
-
-{% block content %}
+{% extends "hotel/base.html" %} {% load static %} {% block title %}All Hotels -
+Star Hotels{% endblock %} {% block content %}
 <!-- Hotels List Page -->
 <div class="container py-5">
   <!-- Page Header -->
   <div class="text-center mb-5">
     <h1 class="display-4 fw-bold">Explore Our Hotels</h1>
-    <p class="lead text-muted">Discover comfort and luxury at our diverse selection of hotels</p>
+    <p class="lead text-muted">
+      Discover comfort and luxury at our diverse selection of hotels
+    </p>
   </div>
 
   <!-- Search and Filter Section -->
   <div class="row mb-5">
-    <div class="col-md-8 mx-auto">
+    <div class="col-md-12 mx-auto">
       <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-4">
           <form class="row g-3" method="get" id="searchForm">
             <div class="col-md-12">
               <label for="search" class="form-label">Search Hotels</label>
               <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" id="search" name="search" placeholder="Search by name or location" value="{{ search_query }}">
+                <span class="input-group-text"
+                  ><i class="fas fa-search"></i
+                ></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="search"
+                  name="search"
+                  placeholder="Search by name or location"
+                  value="{{ search_query }}"
+                />
               </div>
             </div>
           </form>
@@ -38,8 +45,12 @@
       <div class="card h-100 border-0 shadow-sm rounded-4 hover-card">
         <!-- Hotel Image -->
         <div class="position-relative">
-          <img src="{{ hotel.image.url }}" class="card-img-top rounded-top-4" alt="{{ hotel.name }}" 
-               style="height: 200px; object-fit: cover;">
+          <img
+            src="{{ hotel.image.url }}"
+            class="card-img-top rounded-top-4"
+            alt="{{ hotel.name }}"
+            style="height: 200px; object-fit: cover"
+          />
           <!-- Rating badge -->
           <div class="position-absolute top-0 end-0 m-3">
             <span class="badge rounded-pill text-bg-primary fw-bold">
@@ -47,35 +58,36 @@
             </span>
           </div>
         </div>
-        
+
         <!-- Card Body -->
         <div class="card-body p-4">
           <h5 class="card-title fw-bold mb-3">{{ hotel.name }}</h5>
-          
-          <div class="mb-3">
+
+          <div class="mb-5" style="height: 20vh">
             <p class="card-text text-muted mb-2">
               <i class="fas fa-map-marker-alt me-2"></i>{{ hotel.location }}
             </p>
             <p class="card-text">{{ hotel.description|truncatechars:100 }}</p>
+
+            <!-- Contact Info -->
+            <p class="card-text small text-muted mb-3">
+              <i class="fas fa-phone-alt me-2"></i>{{ hotel.contact_number }}
+            </p>
           </div>
-          
-          <!-- Contact Info -->
-          <p class="card-text small text-muted mb-3">
-            <i class="fas fa-phone-alt me-2"></i>{{ hotel.contact_number }}
-          </p>
-          
+
           <!-- View More Button -->
-          <a href="{% url 'hotel_detail' hotel.id %}" class="btn w-100 text-white" 
-             style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);">
-            <i class="fas fa-info-circle me-2"></i>View Details
-          </a>
+          <a
+            href="{% url 'hotel_detail' hotel.pk %}"
+            class="btn btn-primary w-100 rounded-pill"
+            >View Details</a
+          >
         </div>
       </div>
     </div>
     {% empty %}
     <div class="col-12 text-center py-5" id="noResults">
       <div class="py-5">
-        <i class="fas fa-hotel text-muted mb-3" style="font-size: 3rem;"></i>
+        <i class="fas fa-hotel text-muted mb-3" style="font-size: 3rem"></i>
         <h3 class="text-muted mb-4">No hotels found</h3>
         <p class="lead">Please try adjusting your search criteria.</p>
       </div>
@@ -90,66 +102,87 @@
   }
   .hover-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+  .btn {
+    background: #0f2027;
+    color: white;
+    transition: 0.3s ease-in;
+  }
+
+  .btn:hover {
+    background-color: #2c5364;
+    color: white;
   }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.getElementById('search');
-  const sortSelect = document.getElementById('sort');
-  const hotelItems = document.querySelectorAll('.hotel-item');
-  const hotelGrid = document.getElementById('hotelsGrid');
-  const noResults = document.getElementById('noResults');
-  
-  // Function to filter hotels
-  function filterHotels() {
-    const searchTerm = searchInput.value.toLowerCase().trim();
-    let visibleCount = 0;
-    
-    hotelItems.forEach(function(hotel) {
-      const name = hotel.querySelector('.card-title').textContent.toLowerCase();
-      const location = hotel.querySelector('.card-text.text-muted').textContent.toLowerCase();
-      const description = hotel.querySelectorAll('.card-text')[1].textContent.toLowerCase();
-      
-      if (name.includes(searchTerm) || location.includes(searchTerm) || description.includes(searchTerm) || searchTerm === '') {
-        hotel.style.display = '';
-        visibleCount++;
-      } else {
-        hotel.style.display = 'none';
-      }
-    });
-    
-    // Show "no results" message if no hotels are visible
-    if (visibleCount === 0 && hotelItems.length == 0) {
-      if (!noResults) {
-        const noResultsElement = document.createElement('div');
-        noResultsElement.className = 'col-12 text-center py-5';
-        noResultsElement.id = 'noResults';
-        noResultsElement.innerHTML = `
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search");
+    const sortSelect = document.getElementById("sort");
+    const hotelItems = document.querySelectorAll(".hotel-item");
+    const hotelGrid = document.getElementById("hotelsGrid");
+    const noResults = document.getElementById("noResults");
+
+    // Function to filter hotels
+    function filterHotels() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      let visibleCount = 0;
+
+      hotelItems.forEach(function (hotel) {
+        const name = hotel
+          .querySelector(".card-title")
+          .textContent.toLowerCase();
+        const location = hotel
+          .querySelector(".card-text.text-muted")
+          .textContent.toLowerCase();
+        const description = hotel
+          .querySelectorAll(".card-text")[1]
+          .textContent.toLowerCase();
+
+        if (
+          name.includes(searchTerm) ||
+          location.includes(searchTerm) ||
+          description.includes(searchTerm) ||
+          searchTerm === ""
+        ) {
+          hotel.style.display = "";
+          visibleCount++;
+        } else {
+          hotel.style.display = "none";
+        }
+      });
+
+      // Show "no results" message if no hotels are visible
+      if (visibleCount === 0 && hotelItems.length == 0) {
+        if (!noResults) {
+          const noResultsElement = document.createElement("div");
+          noResultsElement.className = "col-12 text-center py-5";
+          noResultsElement.id = "noResults";
+          noResultsElement.innerHTML = `
           <div class="py-5">
             <i class="fas fa-hotel text-muted mb-3" style="font-size: 3rem;"></i>
             <h3 class="text-muted mb-4">No hotels found</h3>
             <p class="lead">Please try adjusting your search criteria.</p>
           </div>
         `;
-        hotelGrid.appendChild(noResultsElement);
-      } else {
-        noResults.style.display = '';
+          hotelGrid.appendChild(noResultsElement);
+        } else {
+          noResults.style.display = "";
+        }
+      } else if (noResults) {
+        noResults.style.display = "none";
       }
-    } else if (noResults) {
-      noResults.style.display = 'none';
     }
-  }
-  
-  // Live search - filter on input
-  searchInput.addEventListener('input', filterHotels);
-  
-  // Sort functionality
-  sortSelect.addEventListener('change', function() {
-    // We'll submit the form for sorting since it requires server-side processing
-    document.getElementById('searchForm').submit();
+
+    // Live search - filter on input
+    searchInput.addEventListener("input", filterHotels);
+
+    // Sort functionality
+    sortSelect.addEventListener("change", function () {
+      // We'll submit the form for sorting since it requires server-side processing
+      document.getElementById("searchForm").submit();
+    });
   });
-});
 </script>
 {% endblock %}

@@ -30,7 +30,12 @@ searchInput.addEventListener('input', function () {
                 <div class="position-relative">
                   <img src="${hotel.image_url}" class="card-img-top" alt="${hotel.name}" style="height: 250px; object-fit: cover;">
                 </div>
-                <div class="card-body d-flex flex-column">
+                <div class="position-absolute top-0 end-0 m-3">
+                  <span class="badge rounded-pill text-bg-primary fw-bold">
+                    <i class="fas fa-star me-1"></i>${ hotel.rating }
+                  </span>
+                </div>
+                <div class="card-body d-flex flex-column" style="height: 40vh;">
                   <h5 class="card-title">${hotel.name}</h5>
                   <h6 class="card-subtitle text-muted mb-2">${hotel.location}</h6>
                   <p class="card-text">${hotel.description}</p>
