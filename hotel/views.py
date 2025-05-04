@@ -22,6 +22,7 @@ from django.template.loader import render_to_string
 import os
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
+import  time, requests
 
 
 # Create your views here.
@@ -515,3 +516,165 @@ def hotels_list(request):
     """View function to display all hotels."""
     hotels = Hotel.objects.all()
     return render(request, 'hotel/hotels_list.html', {'hotels': hotels})
+
+
+def check_availability(request):
+    room_id = request.GET.get('room_id')
+    check_in = request.GET.get('check_in')
+    check_out = request.GET.get('check_out')
+
+    try:
+        room = Room.objects.get(id=room_id)
+        check_in_date = datetime.strptime(check_in, '%Y-%m-%d').date()
+        check_out_date = datetime.strptime(check_out, '%Y-%m-%d').date()
+
+        overlapping = Booking.objects.filter(
+            room=room,
+            check_in_date__lt=check_out_date,
+            check_out_date__gt=check_in_date,
+            payment_status='Paid'
+        ).exists()
+        print(overlapping)
+        return JsonResponse({'available': not overlapping})
+    except Exception as e:
+        return JsonResponse({'available': False, 'error': str(e)})
+class PaymobClient:
+    def __init__(self):
+        self.api_key = settings.PAYMOB_API_KEY
+        self.public_key = settings.PAYMOB_PUBLIC_KEY
+        self.secret_key = f"Token {settings.PAYMOB_SECRET_KEY}"
+        # self.card_iframe_id = settings.PAYMOB_CARD_IFRAME_ID
+
+    def checkout(self, total_price, integration_id, booking_id):
+        payload = {
+        "amount": int(total_price * 100),
+        "currency": "EGP",
+        "payment_methods": [int(integration_id)],
+        "billing_data": {
+            "first_name": "Test",
+            "last_name": "User",
+            "phone_number": "01066415951",
+            "email": "test@example.com",
+        },
+        "special_reference": booking_id,
+        "merchant_order_id": booking_id,
+        "redirection_url": "http://127.0.0.1:8000/paymob/callback",
+        "extras": {
+            "ee": 22
+        }
+        }
+
+        response = requests.post(
+            "https://accept.paymob.com/v1/intention/",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": self.secret_key,
+            },
+            json=payload
+        )
+        data = response.json()
+        print("DEBUG Paymob response:", data)  # Debugging line
+        if 'client_secret' in data:
+            return redirect(f"https://accept.paymob.com/unifiedcheckout/?publicKey={self.public_key}&clientSecret={data['client_secret']}")
+        else:
+            raise Exception("Payment initiation failed. Please try again later.")
+
+def book_rooms(request, room_id):
+    if request.method == 'POST':
+        check_in = request.POST.get('check_in')
+        check_out = request.POST.get('check_out')
+        room = Room.objects.get(id=room_id)
+        user = request.user
+        print("DEBUG check_in:", check_in)
+        print("DEBUG check_out:", check_out)
+        nights = (datetime.strptime(check_out, "%Y-%m-%d") - datetime.strptime(check_in, "%Y-%m-%d")).days
+        total_price = nights * float(room.price_per_night)
+        # Check if the room is already booked for the selected dates
+        # overlapping_bookings = Booking.objects.filter(
+        #     room=room,
+        #     check_in_date__lt=check_out,
+        #     check_out_date__gt=check_in,
+        #     payment_status='Pending'
+        # )
+        # if overlapping_bookings.exists():
+        #     messages.error(request, "The room is not available for the selected dates.")
+        #     return redirect('book_room', pk=room.pk)
+        
+        booking = Booking.objects.create(
+            room=room,
+            user=user,
+            check_in_date=check_in,
+            check_out_date=check_out,
+            total_price=total_price
+        )
+        # Log the booking or use it for further processing
+        print(f"Booking created: {booking}")
+
+        
+        integration_ids = {
+            "paymob_card_payment": settings.PAYMOB_CARD_INTEGRATION_ID,
+            "paymob_wallet_payment": settings.PAYMOB_WALLET_INTEGRATION_ID,
+          
+        }
+
+        payment_method = request.POST.get('payment_method')  # Retrieve payment method from the request
+        print("DEBUG payment_method:", payment_method)
+        if payment_method in integration_ids:
+            return PaymobClient().checkout(booking.total_price, integration_ids[payment_method], booking.pk)
+
+        else:
+            messages.error(request, "Invalid payment method selected.")
+            return redirect('hotel_detail', pk=room.hotel.id)
+        
+        
+# import hmac
+# import hashlib
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+
+@csrf_exempt
+def paymob_callback(request):
+    data = request.POST or request.GET
+
+    # concat_str = (
+    #     data['amount_cents'] + data['created_at'] + data['currency'] + data['error_occured'] +
+    #     data['has_parent_transaction'] + data['id'] + data['integration_id'] +
+    #     data['is_3d_secure'] + data['is_auth'] + data['is_capture'] + data['is_refunded'] +
+    #     data['is_standalone_payment'] + data['is_voided'] + data['order'] + data['owner'] +
+    #     data['pending'] + data['source_data_pan'] + data['source_data_sub_type'] +
+    #     data['source_data_type'] + data['success']
+    # )
+
+    # hmac_secret = settings.PAYMOB_HMAC
+    # generated_hmac = hmac.new(
+    #     hmac_secret.encode('utf-8'),
+    #     concat_str.encode('utf-8'),
+    #     hashlib.sha512
+    # ).hexdigest()
+
+    # if generated_hmac == data['hmac']:
+    booking_id = data.get('merchant_order_id')
+    booking_id2 = data.get('special_reference')
+    print("DEBUG type of booking_id:", booking_id,booking_id2)
+    booking = get_object_or_404(Booking, pk=int(booking_id))
+
+    if data['success'] == 'true':
+        # booking.amount_paid = int(data['amount_cents']) / 100
+        booking.payment_status = "Paid"
+        # booking.transaction_id = data['id']
+        booking.save()
+        status = "success"
+        return render(request, 'hotel/payment_status.html', {'status': status})
+    else:
+        # booking.payment_status = "Failed"
+        booking.delete()
+        status = "failed"
+        return render(request, 'hotel/payment_status', {'status': status})
+    # else:
+    #     return HttpResponse("Invalid HMAC", status=403)
+    
+def custom_404_view(request, exception):
+    print("DEBUG 404 error:", exception)
+    print("DEBUG 404 request path:", request)
+    return redirect('/')

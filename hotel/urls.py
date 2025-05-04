@@ -20,5 +20,7 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('user-reservations/', views.user_reservations, name='user_reservations'),
     path('cancel-booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
+    path('book_rooms/<int:room_id>/', views.book_rooms, name='book_rooms'),
+    path('paymob/callback/', views.paymob_callback, name='paymob_callback'),
 ]
 

@@ -50,6 +50,7 @@ class Booking(models.Model):
     check_out_date = models.DateField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     booking_date = models.DateTimeField(auto_now_add=True)  # Automatically set the date when the booking is made
+    payment_status = models.CharField(max_length=20, default='Pending')  # e.g., Pending, Completed, Cancelled
 
 class Review(models.Model):
     RATING_CHOICES = (

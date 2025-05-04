@@ -18,8 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from hotel import views
 
+handler404 = 'hotel.views.custom_404_view'
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hotel/', include('hotel.urls')),
+    path('', include('hotel.urls')),
+    path('check-availability/', views.check_availability, name='check_availability'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

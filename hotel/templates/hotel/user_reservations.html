@@ -33,6 +33,7 @@
                     <th>Check-out</th>
                     <th>Booked On</th>
                     <th>Total Price</th>
+                    <th>Payment Status</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -77,6 +78,13 @@
                     <td>
                       <span class="fw-bold">${{ booking.total_price }}</span>
                     </td>
+                    {% if booking.payment_status == 'Paid' %}
+                      <td><span class="badge rounded-pill text-bg-success">Paid</span></td>
+                    {% elif booking.payment_status == 'Pending' %}
+                      <td><span class="badge rounded-pill text-bg-warning">Pending</span></td>
+                    {% else %}
+                      <td><span class="badge rounded-pill text-bg-danger">Failed</span></td>
+                    {% endif %}
                     <td>
                       {% if booking.check_in_date|date:"Y-m-d" > now|date:"Y-m-d" %}
                         <span class="badge rounded-pill text-bg-primary">Upcoming</span>

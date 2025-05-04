@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-
 from pathlib import Path
 import os
 from decouple import config
@@ -23,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k5ng7tvotr)d7&%*hhmie$(**=j=f2ktgn32mcjs8y2(zsic$-'
+SECRET_KEY = config("SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = False
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -197,3 +196,9 @@ EMAIL_HOST_USER = 'b7398598174df0'  # Your Mailtrap username
 EMAIL_HOST_PASSWORD = '1e27d455a60ee1'  # Your Mailtrap password
 DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'  # From email
     
+PAYMOB_API_KEY = config("PAYMOB_API_KEY")
+PAYMOB_PUBLIC_KEY = config("PAYMOB_PUBLIC_KEY")
+PAYMOB_SECRET_KEY = config("PAYMOB_SECRET_KEY")
+# PAYMOB_HMAC = config("PAYMOB_HMAC")
+PAYMOB_CARD_INTEGRATION_ID = config("PAYMOB_CARD_INTEGRATION_ID")
+PAYMOB_WALLET_INTEGRATION_ID = config("PAYMOB_WALLET_INTEGRATION_ID")

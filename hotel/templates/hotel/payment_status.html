@@ -1,0 +1,20 @@
+{% extends 'hotel/base.html' %}
+{% block title %}Payment Status{% endblock %}
+{% block content %}
+<div class="payment-status-container" style="text-align: center; margin-top: 50px;">
+    {% if status == 'success' %}
+        <h1 style="color: green; font-size: 2.5em;">Payment Successful</h1>
+        <p style="font-size: 1.2em; color: #555;">Your payment was successful. Thank you for your booking!</p>
+        <i class="fas fa-check-circle" style="font-size: 4em; color: green; margin-top: 20px;"></i>
+    {% elif status == 'failed' %}
+        <h1 style="color: red; font-size: 2.5em;">Payment Failed</h1>
+        <p style="font-size: 1.2em; color: #555;">Unfortunately, your payment could not be processed. Please try again.</p>
+        <i class="fas fa-times-circle" style="font-size: 4em; color: red; margin-top: 20px;"></i>
+    {% else %}
+        <h1 style="color: orange; font-size: 2.5em;">Payment Status Unknown</h1>
+        <p style="font-size: 1.2em; color: #555;">We are unable to determine the status of your payment. Please contact support.</p>
+        <i class="fas fa-exclamation-circle" style="font-size: 4em; color: orange; margin-top: 20px;"></i>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -74,37 +74,60 @@
                     </div>
                     
                     <!-- Booking Form -->
-                    <form method="post" class="mt-4">
+                    <h5 class="text-primary border-bottom pb-2 mb-4">
+                        <i class="fas fa-calendar-check me-2"></i>Make a Reservation
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="check_in_date" class="form-label">Check-in Date</label>
+                            <input type="date" class="form-control" id="check_in_date" name="check_in" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="check_out_date" class="form-label">Check-out Date</label>
+                            <input type="date" class="form-control" id="check_out_date" name="check_out" required>
+                        </div>
+                    </div>
+                    <form method="post" class="mt-4" action="{% url 'book_rooms' room.id %}">
                         {% csrf_token %}
-                        <h5 class="text-primary border-bottom pb-2 mb-4">
-                            <i class="fas fa-calendar-check me-2"></i>Make a Reservation
-                        </h5>
+                        
                         
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="check_in_date" class="form-label">Check-in Date</label>
-                                <input type="date" class="form-control" id="check_in_date" name="check_in_date" required>
+                                <input type="hidden" class="form-control" id="checkInHidden" name="check_in" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="check_out_date" class="form-label">Check-out Date</label>
-                                <input type="date" class="form-control" id="check_out_date" name="check_out_date" required>
+                                <input type="hidden" class="form-control" id="checkOutHidden" name="check_out" required>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Select Payment Method:</h5>
+
+                                <label>
+                                  <input type="radio" name="payment_method" value="paymob_card_payment" required>
+                                  💳 Credit/Debit Card
+                                </label><br>
+                              
+                                <label>
+                                  <input type="radio" name="payment_method" value="paymob_wallet_payment">
+                                  📱 Wallet (Vodafone Cash, etc.)
+                                </label><br>
                             </div>
                             <div class="col-12">
                                 <div class="d-grid">
-                                    <button type="submit" class="btn py-2 text-white" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);" {% if not room.availability %}disabled{% endif %}>
+                                    <button type="submit" class="btn py-2 text-white" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);" id="bookBtn" disabled onclick="checkAvailability()">
                                         <i class="fas fa-check-circle me-2"></i>Book Now
                                     </button>
                                 </div>
-                                {% if not room.availability %}
-                                <div class="alert alert-danger mt-3">
+                                
+                                <div class="alert alert-danger mt-3" id="availability-msg" hidden>
                                     <i class="fas fa-exclamation-circle me-2"></i>This room is currently not available for booking.
                                 </div>
-                                {% endif %}
+                                
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
+   
             
             <!-- Reviews Section -->
             <div class="card border-0 rounded-4 shadow mt-4">
@@ -389,6 +412,42 @@
         }
     });
 </script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const checkIn = document.getElementById('check_in_date');
+      const checkOut = document.getElementById('check_out_date');
+      const msg = document.getElementById('availability-msg');
+      const bookBtn = document.getElementById('bookBtn');
+      const checkInHidden = document.getElementById('checkInHidden');
+      const checkOutHidden = document.getElementById('checkOutHidden');
+    
+      function checkAvailability() {
+        if (checkIn.value && checkOut.value) {
+          fetch(`/check-availability/?room_id={{ room.id }}&check_in=${checkIn.value}&check_out=${checkOut.value}`)
+            .then(res => res.json())
+            .then(data => {
+              if (!data.available) {
+                msg.hidden = false;
+                bookBtn.disabled = true;
+                
+              }
+                else {
+                    msg.hidden = true;
+                    bookBtn.disabled = false;
+                }
+
+            checkInHidden.value = checkIn.value;
+            checkOutHidden.value = checkOut.value;  
+            });
+        }
+      }
+    
+      checkIn.addEventListener('change', checkAvailability);
+      checkOut.addEventListener('change', checkAvailability);
+    });
+    </script>
 
 <style>
     /* Existing styles */
