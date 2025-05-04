@@ -6,7 +6,7 @@ const selectedHotels = document.getElementById('selected-hotels');
 searchInput.addEventListener('input', function () {
     const query = searchInput.value.trim();
 
-    fetch(`/hotel/ajax/hotel-search/?location=${encodeURIComponent(query)}`)
+    fetch(`/ajax/hotel-search/?location=${encodeURIComponent(query)}`)
         .then(response => response.json())
         .then(data => {
             resultsContainer.innerHTML = '';
