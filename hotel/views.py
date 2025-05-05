@@ -266,6 +266,8 @@ def edit_profile_view(request, pk):
 def book_room(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     bookings = room.bookings.all()  # Get all bookings for this room
+    for booking in bookings:
+     booking.adjusted_checkout = booking.check_out_date - timedelta(days=1)
     reviews = room.reviews.all()  # Get all reviews for this room
     
     # Process amenities to a list for better display
@@ -556,8 +558,8 @@ class PaymobClient:
             "phone_number": "01066415951",
             "email": "test@example.com",
         },
-        "special_reference": booking_id,
-        "merchant_order_id": booking_id,
+        "special_reference": f"{booking_id}_{int(time.time())}",
+        # "merchant_order_id": booking_id,
         "redirection_url": "http://127.0.0.1:8000/paymob/callback",
         "extras": {
             "ee": 22
@@ -590,15 +592,23 @@ def book_rooms(request, room_id):
         nights = (datetime.strptime(check_out, "%Y-%m-%d") - datetime.strptime(check_in, "%Y-%m-%d")).days
         total_price = nights * float(room.price_per_night)
         # Check if the room is already booked for the selected dates
-        # overlapping_bookings = Booking.objects.filter(
-        #     room=room,
-        #     check_in_date__lt=check_out,
-        #     check_out_date__gt=check_in,
-        #     payment_status='Pending'
-        # )
-        # if overlapping_bookings.exists():
-        #     messages.error(request, "The room is not available for the selected dates.")
-        #     return redirect('book_room', pk=room.pk)
+        overlapping_bookings = Booking.objects.filter(
+            room=room,
+            check_in_date__lt=check_out,
+            check_out_date__gt=check_in,
+            payment_status='Paid'
+        )
+        if overlapping_bookings.exists():
+            messages.error(request, "The room is not available for the selected dates.")
+            return redirect('book_room', room_id=room.pk)
+        if check_out < check_in:
+            messages.error(request, "Check-out date must be after check-in date.")
+            return render(request, 'hotel/book_room.html', {
+            'room': room,
+            'check_in': check_in,
+            'check_out': check_out,
+            'error_message': "Check-out date must be after check-in date."
+            })
         
         booking = Booking.objects.create(
             room=room,
@@ -654,9 +664,9 @@ def paymob_callback(request):
     # ).hexdigest()
 
     # if generated_hmac == data['hmac']:
-    booking_id = data.get('merchant_order_id')
-    booking_id2 = data.get('special_reference')
-    print("DEBUG type of booking_id:", booking_id,booking_id2)
+    booking_id = data.get('merchant_order_id').split('_')[0] 
+    # booking_id2 = booking_id.split('_')[0] 
+    print("DEBUG type of booking_id:", booking_id)
     booking = get_object_or_404(Booking, pk=int(booking_id))
 
     if data['success'] == 'true':

@@ -80,11 +80,11 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="check_in_date" class="form-label">Check-in Date</label>
-                            <input type="date" class="form-control" id="check_in_date" name="check_in" required>
+                            <input type="date" class="form-control" id="check_in_date" name="check_in" required value="{{ check_in }}">
                         </div>
                         <div class="col-md-6">
                             <label for="check_out_date" class="form-label">Check-out Date</label>
-                            <input type="date" class="form-control" id="check_out_date" name="check_out" required>
+                            <input type="date" class="form-control" id="check_out_date" name="check_out" required value="{{ check_out }}"> 
                         </div>
                     </div>
                     <form method="post" class="mt-4" action="{% url 'book_rooms' room.id %}">
@@ -121,7 +121,11 @@
                                 <div class="alert alert-danger mt-3" id="availability-msg" hidden>
                                     <i class="fas fa-exclamation-circle me-2"></i>This room is currently not available for booking.
                                 </div>
-                                
+                                {% if check_out < check_in %}
+                                <div class="alert alert-danger mt-3" id="availability-msg">
+                                    <i class="fas fa-exclamation-circle me-2"></i>{{error_message}}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </form>
@@ -279,50 +283,51 @@
             return dates;
         }
     
-        let allDates = [];
-    
-        {% for booking in bookings %}
+         let allDates = [];
+
+    {% for booking in bookings %}
+        {% if booking.payment_status == "Paid" %}
             allDates = allDates.concat(
                 getDatesBetween(
                     "{{ booking.check_in_date|date:'Y-m-d' }}",
-                    "{{ booking.check_out_date|date:'Y-m-d' }}"
+                    "{{ booking.adjusted_checkout|date:'Y-m-d' }}"
                 )
             );
-        {% endfor %}
-    
-        const calendarInput = document.getElementById("booking-calendar");
-    
-        // Update the flatpickr configuration
-        const calendar = flatpickr(calendarInput, {
-            mode: "range",  // Changed from "multiple" to "range" for date range selection
-            dateFormat: "Y-m-d",
-            defaultDate: [],
-            disable: allDates,
-            clickOpens: true,
-            inline: true,
-            minDate: "today",  // Prevent selecting dates in the past
-            // Add this to highlight the booked dates in red
-            onDayCreate: function(dObj, dStr, fp, dayElem) {
-                // Check if this day is in the disabled dates (booked dates)
-                if (allDates.includes(dayElem.dateObj.toISOString().split('T')[0])) {
-                    // Add a class to highlight booked dates
-                    dayElem.className += " booked-date";
-                }
-            },
-            onChange: function(selectedDates, dateStr, instance) {
+        {% endif %}
+    {% endfor %}
+
+    const calendarInput = document.getElementById("booking-calendar");
+
+    const calendar = flatpickr(calendarInput, {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        defaultDate: [],
+        disable: allDates,
+        clickOpens: true,
+        inline: true,
+        minDate: "today",
+
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+    const dateStr = fp.formatDate(dayElem.dateObj, "Y-m-d");
+    if (allDates.includes(dateStr)) {
+        dayElem.classList.add("booked-date");
+    }
+},
+
+        onChange: function(selectedDates, dateStr, instance) {
                 // When dates are selected in the calendar
-                if (selectedDates.length === 1) {
+            if (selectedDates.length === 1) {
                     // First date selected (check-in)
-                    checkInDate.value = formatDate(selectedDates[0]);
+                checkInDate.value = formatDate(selectedDates[0]);
                     // Reset check-out date when new check-in is selected
-                    checkOutDate.value = "";
-                } else if (selectedDates.length === 2) {
+                checkOutDate.value = "";
+            } else if (selectedDates.length === 2) {
                     // Both dates selected (check-in and check-out)
-                    checkInDate.value = formatDate(selectedDates[0]);
-                    checkOutDate.value = formatDate(selectedDates[1]);
-                }
+                checkInDate.value = formatDate(selectedDates[0]);
+                checkOutDate.value = formatDate(selectedDates[1]);
             }
-        });
+        }
+    });
         
         // Helper function to format dates as YYYY-MM-DD
         function formatDate(date) {
