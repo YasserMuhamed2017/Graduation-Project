@@ -62,7 +62,7 @@ class Review(models.Model):
     )
     
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_room')
     rating = models.IntegerField(choices=RATING_CHOICES)
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -72,4 +72,24 @@ class Review(models.Model):
     
     def __str__(self):
         return f"{self.user.email}'s review for Room {self.room.room_number}"
+class Review_hotel(models.Model):
+    RATING_CHOICES = (
+        (1, '1 Star'),
+        (2, '2 Stars'),
+        (3, '3 Stars'),
+        (4, '4 Stars'),
+        (5, '5 Stars'),
+    )
+    
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='reviews_hotel')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_hotel')
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.email}'s review for Hotel {self.hotel.name}"
 

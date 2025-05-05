@@ -170,6 +170,7 @@ def ajax_hotel_search(request):
 def hotel_detail(request, pk):
     hotel = get_object_or_404(Hotel, pk=pk)
     rooms = hotel.rooms.all()
+    # reviews = hotel.reviews_hotel.all()
 
     selected_room_type = request.GET.get('room_type')
     selected_availability = request.GET.get('availability')
@@ -185,10 +186,51 @@ def hotel_detail(request, pk):
     if not selected_room_type:
         for room in rooms:
             grouped_rooms_by_type[room.room_type].append(room)
+            
+            
+    # if 'rating' in request.POST and 'review_text' in request.POST:
+    #         # Handle review submission
+    #         if request.user.is_authenticated:
+    #             rating = request.POST.get('rating')
+    #             review_text = request.POST.get('review_text')
+                
+    #             # Validate
+    #             if rating and review_text:
+    #                 # Check if user has already reviewed this room
+    #                 existing_review = Review_hotel.objects.filter(hotel=hotel, user=request.user).first()
+                    
+    #                 if existing_review:
+    #                     # Update existing review
+    #                     existing_review.rating = rating
+    #                     existing_review.comment = review_text
+    #                     existing_review.save()
+    #                     messages.success(request, "Your review has been updated!")
+    #                 else:
+    #                     # Create new review
+    #                     Review_hotel.objects.create(
+    #                         hotel=hotel,
+    #                         user=request.user,
+    #                         rating=int(rating),
+    #                         comment=review_text
+    #                     )
+    #                     messages.success(request, "Thank you for your review!")
+                    
+    #                 # Refresh reviews after adding/updating
+    #                 reviews = hotel.reviews_hotel.all()
+    #             else:
+    #                 messages.error(request, "Please provide both a rating and review text.")
+    #         else:
+    #             messages.error(request, "You need to be logged in to submit a review.")
+    #             return redirect('login')
+    
+    
+          
 
     context = {
         'hotel': hotel,
         'rooms': rooms,
+        # 'reviews': reviews,
+        # 'user_has_reviewed': request.user.is_authenticated and Review_hotel.objects.filter(hotel=hotel, user=request.user).exists(),
         'selected_room_type': selected_room_type,
         'selected_availability': selected_availability,
         'grouped_rooms_by_type': dict(grouped_rooms_by_type),
