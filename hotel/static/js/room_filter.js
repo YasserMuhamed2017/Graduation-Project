@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const type = roomType.value;
         const avail = availability.value;
   
-        fetch(`/hotel/ajax/filter-rooms/${hotelId}/?room_type=${type}&availability=${avail}`)
+        fetch(`/ajax/filter-rooms/${hotelId}/?room_type=${type}&availability=${avail}`)
           .then(response => response.json())
           .then(data => {
             document.getElementById('filtered-rooms').innerHTML = data.html;

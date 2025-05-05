@@ -688,3 +688,59 @@ def custom_404_view(request, exception):
     print("DEBUG 404 error:", exception)
     print("DEBUG 404 request path:", request)
     return redirect('/')
+
+
+def contact_us(request):
+    """Handle contact form submissions from the about page"""
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        
+        # Check if ajax request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        # Validate inputs
+        if not all([name, email, message]):
+            if is_ajax:
+                return JsonResponse({'success': False, 'message': "Please fill in all fields."})
+            messages.error(request, "Please fill in all fields.")
+            return redirect('about')
+        
+        # Send email notification
+        subject = f"Contact Form: {name}"
+        
+        # Create HTML email with attractive formatting
+        html_message = render_to_string('hotel/email/contact_email.html', {
+            'name': name,
+            'email': email,
+            'message': message,
+            'date': timezone.now().strftime("%B %d, %Y, %I:%M %p"),
+        })
+        
+        # Plain text fallback
+        plain_message = strip_tags(html_message)
+        
+        try:
+            send_mail(
+                subject,
+                plain_message,  # Plain text fallback
+                settings.EMAIL_HOST_USER,
+                [settings.EMAIL_HOST_USER],  # Send to site admin
+                html_message=html_message,  # HTML message
+                fail_silently=False,
+            )
+            
+            if is_ajax:
+                return JsonResponse({'success': True, 'message': "Your message has been sent successfully! We'll get back to you soon."})
+            
+            messages.success(request, "Your message has been sent successfully! We'll get back to you soon.")
+        except Exception as e:
+            print(f"Email error: {str(e)}")
+            
+            if is_ajax:
+                return JsonResponse({'success': False, 'message': "Failed to send your message. Please try again later."})
+            
+            messages.error(request, "Failed to send your message. Please try again later.")
+        
+        return redirect('about')
