@@ -121,11 +121,11 @@
                                 <div class="alert alert-danger mt-3" id="availability-msg" hidden>
                                     <i class="fas fa-exclamation-circle me-2"></i>This room is currently not available for booking.
                                 </div>
-                                {% if check_out < check_in %}
-                                <div class="alert alert-danger mt-3" id="availability-msg">
-                                    <i class="fas fa-exclamation-circle me-2"></i>{{error_message}}
+                                
+                                <div class="alert alert-danger mt-3" id="check_in_out-msg" hidden>
+                                    <i class="fas fa-exclamation-circle me-2"></i>Check-out date must be after check-in date.
                                 </div>
-                                {% endif %}
+                                
                             </div>
                         </div>
                     </form>
@@ -427,25 +427,32 @@
       const bookBtn = document.getElementById('bookBtn');
       const checkInHidden = document.getElementById('checkInHidden');
       const checkOutHidden = document.getElementById('checkOutHidden');
-    
+      const checkInOutMsg = document.getElementById('check_in_out-msg');
       function checkAvailability() {
         if (checkIn.value && checkOut.value) {
-          fetch(`/check-availability/?room_id={{ room.id }}&check_in=${checkIn.value}&check_out=${checkOut.value}`)
-            .then(res => res.json())
-            .then(data => {
-              if (!data.available) {
-                msg.hidden = false;
+            if (checkIn.value > checkOut.value) {
+                checkInOutMsg.hidden = false;
                 bookBtn.disabled = true;
-                
-              }
-                else {
-                    msg.hidden = true;
-                    bookBtn.disabled = false;
-                }
-
-            checkInHidden.value = checkIn.value;
-            checkOutHidden.value = checkOut.value;  
-            });
+            } else {
+                checkInOutMsg.hidden = true;
+            
+                fetch(`/check-availability/?room_id={{ room.id }}&check_in=${checkIn.value}&check_out=${checkOut.value}`)
+                  .then(res => res.json())
+                  .then(data => {
+                    if (!data.available) {
+                      msg.hidden = false;
+                      bookBtn.disabled = true;
+                      
+                    }
+                      else {
+                          msg.hidden = true;
+                          bookBtn.disabled = false;
+                      }
+      
+                  checkInHidden.value = checkIn.value;
+                  checkOutHidden.value = checkOut.value;  
+                  });
+            }
         }
       }
     

@@ -603,12 +603,14 @@ def book_rooms(request, room_id):
             return redirect('book_room', room_id=room.pk)
         if check_out < check_in:
             messages.error(request, "Check-out date must be after check-in date.")
-            return render(request, 'hotel/book_room.html', {
-            'room': room,
-            'check_in': check_in,
-            'check_out': check_out,
-            'error_message': "Check-out date must be after check-in date."
-            })
+            return redirect('book_room', room_id=room.pk)
+        if nights <= 0:
+            messages.error(request, "Check-out date must be after check-in date.")
+            return redirect('book_room', room_id=room.pk)
+        if not user.is_authenticated:
+            messages.error(request, "You need to be logged in to book a room.")
+            return redirect('login')
+        
         
         booking = Booking.objects.create(
             room=room,
